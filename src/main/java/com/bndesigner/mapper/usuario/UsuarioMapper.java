@@ -20,7 +20,6 @@ public interface UsuarioMapper {
 	
 	void updateEntityFromRequest(
 			UsuarioUpdateRequest request,
-			@MappingTarget Usuario usuario
+			@MappingTarget Usuario usuario	
 			);
-	
 }
