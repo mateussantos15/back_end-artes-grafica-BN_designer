@@ -1,4 +1,4 @@
-package com.bndesigner.domain.exception.usuario;
+package com.bndesigner.service.exception.usuario;
 
 public class UsuarioNaoEncontradoException extends RuntimeException {
 	

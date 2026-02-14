@@ -1,6 +1,11 @@
 package com.bndesigner.repository.usuario;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Optional;
 
 import com.bndesigner.domain.entity.usuario.Usuario;
 import com.bndesigner.domain.enums.usuario.TipoUsuario;
@@ -33,11 +38,22 @@ class UsuarioRepositoryTest {
 
         usuarioRepository.save(usuario);
 
-        var resultado = usuarioRepository.findByEmail("mateus@email.com");
+        Optional<Usuario> resultado =
+                usuarioRepository.findByEmail("mateus@email.com");
 
-        assertThat(resultado).isPresent();
-        assertThat(resultado.get().getNome()).isEqualTo("Mateus");
+        assertTrue(resultado.isPresent());
+        assertEquals("Mateus", resultado.get().getNome());
     }
+    
+    
+    @Test
+    void deveRetornarVazioQuandoEmailNaoExistir() {
+        Optional<Usuario> resultado =
+                usuarioRepository.findByEmail("inexistente@email.com");
+
+        assertTrue(resultado.isEmpty());
+    }
+    
 
     @Test
     @DisplayName("Deve verificar existência de usuário por email")
@@ -54,5 +70,14 @@ class UsuarioRepositoryTest {
         boolean existe = usuarioRepository.existsByEmail("mateus@email.com");
 
         assertThat(existe).isTrue();
+    }
+    
+    
+    @Test
+    void deveRetornarFalseQuandoEmailNaoExistir() {
+        boolean existe =
+                usuarioRepository.existsByEmail("inexistente@email.com");
+
+        assertFalse(existe);
     }
 }

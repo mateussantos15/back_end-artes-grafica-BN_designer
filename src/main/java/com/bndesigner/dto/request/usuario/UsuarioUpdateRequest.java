@@ -1,13 +1,16 @@
 package com.bndesigner.dto.request.usuario;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
-public class UsuarioUpdateRequest {
+public record UsuarioUpdateRequest (
 	
 	@NotBlank
-	private String nome;
-}
+	String nome,
+	
+	String sobrenome,
+	
+	@NotBlank
+	@Email
+	String email
+) {}

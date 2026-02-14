@@ -1,14 +1,9 @@
 package com.bndesigner.dto.response.usuario;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-public class UsuarioResponse {
+public record UsuarioResponse (
 	
-	private Long id;
-	private String nome;
-	private String email;
-	private String sobrenome;
-}
+	Long idUsuario,
+	String nome,
+	String sobrenome,
+	String email
+) {}

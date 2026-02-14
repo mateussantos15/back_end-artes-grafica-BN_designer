@@ -2,22 +2,19 @@ package com.bndesigner.dto.request.usuario;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
 
-
-@Getter
-@Setter
-public class UsuarioCreateRequest {
+public record UsuarioCreateRequest (
 	
 	@NotBlank
-	private String nome;
+	String nome,
+	
+	String sobrenome,
 	
 	@Email
 	@NotBlank
-	private String email;
+	String emai,
 	
 	@NotBlank
-	private String senha;
+	String senha
 
-}
+) {}
