@@ -1,4 +1,4 @@
-package com.bndesigner.controller.exception;
+package com.bndesigner.exceptions.handler;
 
 import java.time.OffsetDateTime;
 
