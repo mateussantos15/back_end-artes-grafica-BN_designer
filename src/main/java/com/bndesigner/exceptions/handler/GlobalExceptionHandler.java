@@ -1,7 +1,8 @@
-package com.bndesigner.controller.exception;
+package com.bndesigner.exceptions.handler;
 
-import com.bndesigner.service.exception.usuario.UsuarioNaoEncontradoException;
-import com.bndesigner.service.exception.usuario.EmailJaCadastradoException;
+import com.bndesigner.exceptions.usuario.EmailJaCadastradoException;
+import com.bndesigner.exceptions.usuario.UsuarioNaoEncontradoException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

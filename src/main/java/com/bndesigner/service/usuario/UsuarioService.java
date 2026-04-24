@@ -11,10 +11,10 @@ import com.bndesigner.domain.entity.usuario.Usuario;
 import com.bndesigner.dto.request.usuario.UsuarioCreateRequest;
 import com.bndesigner.dto.request.usuario.UsuarioUpdateRequest;
 import com.bndesigner.dto.response.usuario.UsuarioResponse;
+import com.bndesigner.exceptions.usuario.EmailJaCadastradoException;
+import com.bndesigner.exceptions.usuario.UsuarioNaoEncontradoException;
 import com.bndesigner.mapper.usuario.UsuarioMapper;
 import com.bndesigner.repository.usuario.UsuarioRepository;
-import com.bndesigner.service.exception.usuario.EmailJaCadastradoException;
-import com.bndesigner.service.exception.usuario.UsuarioNaoEncontradoException;
 
 import lombok.RequiredArgsConstructor;
 

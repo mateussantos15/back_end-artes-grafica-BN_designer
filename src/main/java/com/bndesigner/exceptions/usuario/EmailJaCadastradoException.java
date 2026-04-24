@@ -1,4 +1,4 @@
-package com.bndesigner.service.exception.usuario;
+package com.bndesigner.exceptions.usuario;
 
 public class EmailJaCadastradoException extends RuntimeException {
 	
