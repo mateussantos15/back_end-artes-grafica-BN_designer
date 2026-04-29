@@ -12,7 +12,7 @@ public record UsuarioCreateRequest (
 	
 	@Email
 	@NotBlank
-	String emai,
+	String email,
 	
 	@NotBlank
 	String senha
