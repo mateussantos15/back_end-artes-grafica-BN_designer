@@ -24,6 +24,7 @@ import com.bndesigner.exceptions.usuario.EmailJaCadastradoException;
 import com.bndesigner.exceptions.usuario.UsuarioNaoEncontradoException;
 import com.bndesigner.mapper.usuario.UsuarioMapper;
 import com.bndesigner.repository.usuario.UsuarioRepository;
+import com.bndesigner.service.usuario.impl.UsuarioServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class UsuarioServiceTest {
@@ -35,7 +36,7 @@ class UsuarioServiceTest {
     private UsuarioMapper usuarioMapper;
 
     @InjectMocks
-    private UsuarioService usuarioService;
+    private UsuarioServiceImpl implService;
 
     @Test
     void deveCriarUsuarioComSucesso() {
@@ -47,7 +48,7 @@ class UsuarioServiceTest {
         UsuarioResponse response =
                 new UsuarioResponse(1L, "Mateus", "Santos", "mateus@email.com");
 
-        when(usuarioRepository.existsByEmail(request.emai()))
+        when(usuarioRepository.existsByEmail(request.email()))
                 .thenReturn(false);
         when(usuarioMapper.toEntity(request))
                 .thenReturn(usuario);
@@ -56,12 +57,12 @@ class UsuarioServiceTest {
         when(usuarioMapper.toResponse(salvo))
                 .thenReturn(response);
 
-        UsuarioResponse resultado = usuarioService.criar(request);
+        UsuarioResponse resultado = implService.criar(request);
 
         assertNotNull(resultado);
         assertEquals("Mateus", resultado.nome());
 
-        verify(usuarioRepository).existsByEmail(request.emai());
+        verify(usuarioRepository).existsByEmail(request.email());
         verify(usuarioRepository).save(usuario);
     }
 
@@ -70,11 +71,11 @@ class UsuarioServiceTest {
         UsuarioCreateRequest request =
                 new UsuarioCreateRequest("Mateus", "Santos", "mateus@email.com", "123");
 
-        when(usuarioRepository.existsByEmail(request.emai()))
+        when(usuarioRepository.existsByEmail(request.email()))
                 .thenReturn(true);
 
         assertThrows(EmailJaCadastradoException.class,
-                () -> usuarioService.criar(request));
+                () -> implService.criar(request));
 
         verify(usuarioRepository, never()).save(any());
         verify(usuarioMapper, never()).toEntity(any());
@@ -91,7 +92,7 @@ class UsuarioServiceTest {
         when(usuarioMapper.toResponse(usuario))
                 .thenReturn(response);
 
-        UsuarioResponse resultado = usuarioService.buscarPorId(1L);
+        UsuarioResponse resultado = implService.buscarPorId(1L);
 
         assertNotNull(resultado);
         assertEquals("Mateus", resultado.nome());
@@ -103,7 +104,7 @@ class UsuarioServiceTest {
                 .thenReturn(Optional.empty());
 
         assertThrows(UsuarioNaoEncontradoException.class,
-                () -> usuarioService.buscarPorId(1L));
+                () -> implService.buscarPorId(1L));
     }
 
     @Test
@@ -120,7 +121,7 @@ class UsuarioServiceTest {
                 .thenReturn(response);
 
         Page<UsuarioResponse> resultado =
-                usuarioService.listarTodos(Pageable.unpaged());
+                implService.listarTodos(Pageable.unpaged());
 
         assertEquals(1, resultado.getTotalElements());
     }
@@ -147,7 +148,7 @@ class UsuarioServiceTest {
                 .thenReturn(response);
 
         UsuarioResponse resultado =
-                usuarioService.atualizar(1L, request);
+                implService.atualizar(1L, request);
 
         assertEquals("novo@email.com", resultado.email());
 
@@ -169,30 +170,30 @@ class UsuarioServiceTest {
                 .thenReturn(true);
 
         assertThrows(EmailJaCadastradoException.class,
-                () -> usuarioService.atualizar(1L, request));
+                () -> implService.atualizar(1L, request));
 
         verify(usuarioRepository, never()).save(any());
     }
 
     @Test
-    void deveRemoverUsuarioComSucesso() {
+    void deveDeletarUsuarioComSucesso() {
         Usuario usuario = new Usuario();
 
         when(usuarioRepository.findById(1L))
                 .thenReturn(Optional.of(usuario));
 
-        usuarioService.remover(1L);
+        implService.deletar(1L);
 
         verify(usuarioRepository).delete(usuario);
     }
 
     @Test
-    void deveLancarExcecaoQuandoUsuarioNaoExistirAoRemover() {
+    void deveLancarExcecaoQuandoUsuarioNaoExistirAoDeletar() {
         when(usuarioRepository.findById(1L))
                 .thenReturn(Optional.empty());
 
         assertThrows(UsuarioNaoEncontradoException.class,
-                () -> usuarioService.remover(1L));
+                () -> implService.deletar(1L));
 
         verify(usuarioRepository, never()).delete(any());
     }
