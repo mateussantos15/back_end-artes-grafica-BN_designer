@@ -51,7 +51,7 @@ public class UsuarioServiceImpl implements UsuarioService{
 
 	@Override
 	@Transactional(readOnly = true)
-	public Page<UsuarioResponse> listarTodos(Pageable pageable) {
+	public Page<UsuarioResponse> listar(Pageable pageable) {
 		
 		return usuarioRepository.findAll(pageable)
 				.map(usuarioMapper::toResponse);
