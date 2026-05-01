@@ -41,7 +41,7 @@ public class UsuarioController {
 	
 	@GetMapping
 	public Page<UsuarioResponse> listar(Pageable pageable) {
-	    return usuarioService.listarTodos(pageable);
+	    return usuarioService.listar(pageable);
 	}
 	
 	@PutMapping("/{id}")

@@ -121,7 +121,7 @@ class UsuarioServiceTest {
                 .thenReturn(response);
 
         Page<UsuarioResponse> resultado =
-                implService.listarTodos(Pageable.unpaged());
+                implService.listar(Pageable.unpaged());
 
         assertEquals(1, resultado.getTotalElements());
     }

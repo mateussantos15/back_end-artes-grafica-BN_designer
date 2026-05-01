@@ -10,13 +10,13 @@ import com.bndesigner.dto.response.usuario.UsuarioResponse;
 
 public interface UsuarioService {
 
-	public UsuarioResponse criar(UsuarioCreateRequest request);
+	UsuarioResponse criar(UsuarioCreateRequest request);
 	
-	public UsuarioResponse buscarPorId(Long id);
+	UsuarioResponse buscarPorId(Long id);
 	
-	public Page<UsuarioResponse> listarTodos(Pageable pageable);
+	Page<UsuarioResponse> listar(Pageable pageable);
 
-	public UsuarioResponse atualizar(Long id, UsuarioUpdateRequest usuarioAtualizado);
+	UsuarioResponse atualizar(Long id, UsuarioUpdateRequest usuarioAtualizado);
 	
-	public void deletar(Long id);
+	void deletar(Long id);
 }

@@ -76,7 +76,7 @@ class UsuarioControllerTest {
         Page<UsuarioResponse> page =
                 new PageImpl<>(List.of(response));
 
-        when(usuarioService.listarTodos(any(Pageable.class)))
+        when(usuarioService.listar(any(Pageable.class)))
                 .thenReturn(page);
 
         mockMvc.perform(get("/usuarios"))
