@@ -20,8 +20,8 @@ import com.bndesigner.domain.entity.usuario.Usuario;
 import com.bndesigner.dto.request.usuario.UsuarioCreateRequest;
 import com.bndesigner.dto.request.usuario.UsuarioUpdateRequest;
 import com.bndesigner.dto.response.usuario.UsuarioResponse;
-import com.bndesigner.exceptions.usuario.EmailJaCadastradoException;
-import com.bndesigner.exceptions.usuario.UsuarioNaoEncontradoException;
+import com.bndesigner.exceptions.BusinessException;
+import com.bndesigner.exceptions.ResourceNotFoundException;
 import com.bndesigner.mapper.usuario.UsuarioMapper;
 import com.bndesigner.repository.usuario.UsuarioRepository;
 import com.bndesigner.service.usuario.impl.UsuarioServiceImpl;
@@ -74,7 +74,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.existsByEmail(request.email()))
                 .thenReturn(true);
 
-        assertThrows(EmailJaCadastradoException.class,
+        assertThrows(BusinessException.class,
                 () -> implService.criar(request));
 
         verify(usuarioRepository, never()).save(any());
@@ -103,7 +103,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findById(1L))
                 .thenReturn(Optional.empty());
 
-        assertThrows(UsuarioNaoEncontradoException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> implService.buscarPorId(1L));
     }
 
@@ -169,7 +169,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.existsByEmail(request.email()))
                 .thenReturn(true);
 
-        assertThrows(EmailJaCadastradoException.class,
+        assertThrows(BusinessException.class,
                 () -> implService.atualizar(1L, request));
 
         verify(usuarioRepository, never()).save(any());
@@ -192,7 +192,7 @@ class UsuarioServiceTest {
         when(usuarioRepository.findById(1L))
                 .thenReturn(Optional.empty());
 
-        assertThrows(UsuarioNaoEncontradoException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> implService.deletar(1L));
 
         verify(usuarioRepository, never()).delete(any());

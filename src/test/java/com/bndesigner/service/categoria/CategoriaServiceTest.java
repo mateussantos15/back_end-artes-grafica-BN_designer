@@ -100,7 +100,7 @@ public class CategoriaServiceTest {
 
             assertThatThrownBy(() -> categoriaServiceImpl.criar(request))
                     .isInstanceOf(BusinessException.class)
-                    .hasMessage("Já existe Categoria com esse nome!");
+                    .hasMessage("Já existe uma categoria com o nome: Banners");
 
             verify(categoriaRepository, never()).save(any());
             verify(categoriaMapper, never()).toEntity(any());
@@ -136,7 +136,7 @@ public class CategoriaServiceTest {
 
             assertThatThrownBy(() -> categoriaServiceImpl.buscarPorId(99L))
                     .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage("Categoria não encontrada!");
+                    .hasMessage("Nenhuma categoria encontrada com o id: " + 99L);
 
             verify(categoriaMapper, never()).toResponse(any());
         }
@@ -243,7 +243,7 @@ public class CategoriaServiceTest {
 
             assertThatThrownBy(() -> categoriaServiceImpl.atualizar(1L, request))
                     .isInstanceOf(BusinessException.class)
-                    .hasMessage("Já existe categoria com esse nome!");
+                    .hasMessage("Já existe uma categoria com o nome: Faixas");
 
             verify(categoriaRepository, never()).save(any());
             verify(categoriaMapper, never()).updateEntityFromRequest(any(), any());
@@ -259,7 +259,7 @@ public class CategoriaServiceTest {
 
             assertThatThrownBy(() -> categoriaServiceImpl.atualizar(99L, request))
                     .isInstanceOf(BusinessException.class)
-                    .hasMessage("Categoria não encontrada!");
+                    .hasMessage("Nenhuma categoria encontrada com o id: " + 99L);
 
             verify(categoriaRepository, never()).save(any());
         }
@@ -291,7 +291,7 @@ public class CategoriaServiceTest {
 
             assertThatThrownBy(() -> categoriaServiceImpl.deletar(99L))
                     .isInstanceOf(BusinessException.class)
-                    .hasMessage("Categoria Não Encontrada!");
+                    .hasMessage("Nenhuma categoria encontrada com o id: " + 99);
 
             verify(categoriaRepository, never()).delete(any());
         }
