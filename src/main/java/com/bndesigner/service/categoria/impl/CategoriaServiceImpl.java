@@ -2,6 +2,7 @@ package com.bndesigner.service.categoria.impl;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +31,10 @@ public class CategoriaServiceImpl implements CategoriaService {
 	public CategoriaResponse criar(CategoriaCreateRequest request) {
 		
 		if (categoriaRepository.existsByNome(request.nome())) {
-			throw new BusinessException("Já existe Categoria com esse nome!");
+			throw new BusinessException(
+					HttpStatus.CONFLICT,
+					"Nome já cadastrado",
+					"Já existe uma categoria com o nome: " + request.nome());
 		}
 		
 		Categoria categoria = categoriaMapper.toEntity(request);
@@ -45,7 +49,10 @@ public class CategoriaServiceImpl implements CategoriaService {
 	public CategoriaResponse buscarPorId(Long id) {
 		
 		Categoria categoria = categoriaRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Categoria não encontrada!"));
+				.orElseThrow(() -> new ResourceNotFoundException(
+						HttpStatus.NOT_FOUND,
+						"Categoria não encontrada!",
+						"Nenhuma categoria encontrada com o id: " +id));
 		
 		return categoriaMapper.toResponse(categoria);
 	}
@@ -63,11 +70,17 @@ public class CategoriaServiceImpl implements CategoriaService {
 	public CategoriaResponse atualizar(Long id, CategoriaUpdateRequest categoriaAtualizada) {
 		
 		Categoria categoria = categoriaRepository.findById(id)
-				.orElseThrow(() -> new BusinessException("Categoria não encontrada!"));
+				.orElseThrow(() -> new BusinessException(
+						HttpStatus.NOT_FOUND,
+						"Categoria não encontrada!",
+						"Nenhuma categoria encontrada com o id: " +id));
 		
 		if(!categoria.getNome().equals(categoriaAtualizada.nome())
 				&& categoriaRepository.existsByNome(categoriaAtualizada.nome())) {
-			throw new BusinessException("Já existe categoria com esse nome!");
+			throw new BusinessException(
+					HttpStatus.CONFLICT,
+					"Nome já cadastrado",
+					"Já existe uma categoria com o nome: " + categoriaAtualizada.nome());
 		}
 		
 		categoriaMapper.updateEntityFromRequest(categoriaAtualizada, categoria);
@@ -80,7 +93,10 @@ public class CategoriaServiceImpl implements CategoriaService {
 	public void deletar(Long id) {
 		
 		Categoria categoria = categoriaRepository.findById(id)
-				.orElseThrow(() -> new BusinessException("Categoria Não Encontrada!"));
+				.orElseThrow(() -> new BusinessException(
+						HttpStatus.NOT_FOUND,
+						"Categoria não encontrada!",
+						"Nenhuma categoria encontrada com o id: " +id));
 		
 		categoriaRepository.delete(categoria);
 		

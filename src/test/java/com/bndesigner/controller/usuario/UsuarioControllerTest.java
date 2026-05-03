@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.bndesigner.dto.request.usuario.UsuarioCreateRequest;
 import com.bndesigner.dto.request.usuario.UsuarioUpdateRequest;
 import com.bndesigner.dto.response.usuario.UsuarioResponse;
-import com.bndesigner.service.usuario.UsuarioService;
+import com.bndesigner.service.usuario.impl.UsuarioServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(UsuarioController.class)
@@ -31,7 +31,7 @@ class UsuarioControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private UsuarioService usuarioService;
+    private UsuarioServiceImpl usuarioService;
 
     @Autowired
     private ObjectMapper objectMapper;

@@ -1,9 +1,8 @@
 package com.bndesigner.exceptions.handler;
 
-import com.bndesigner.exceptions.usuario.EmailJaCadastradoException;
-import com.bndesigner.exceptions.usuario.UsuarioNaoEncontradoException;
+import com.bndesigner.exceptions.BusinessException;
+import com.bndesigner.exceptions.ResourceNotFoundException;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,32 +12,28 @@ import java.time.OffsetDateTime;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+	
+	@ExceptionHandler(BusinessException.class)
+	public ResponseEntity<ApiError> handleBusinessException (
+			BusinessException ex) {
+		return ResponseEntity.status(ex.getStatus())
+				.body(new ApiError(
+						ex.getStatus().value(),
+						ex.getTitle(),
+						ex.getMessage(),
+						OffsetDateTime.now()));
+	}
 
-    @ExceptionHandler(UsuarioNaoEncontradoException.class)
-    public ResponseEntity<ApiError> handleUsuarioNaoEncontrado(
-            UsuarioNaoEncontradoException ex
-    ) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(new ApiError(
-                        404,
-                        "Usuário não encontrado",
-                        ex.getMessage(),
-                        OffsetDateTime.now()
-                ));
-    }
-
-    @ExceptionHandler(EmailJaCadastradoException.class)
-    public ResponseEntity<ApiError> handleEmailJaCadastrado(
-            EmailJaCadastradoException ex
-    ) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new ApiError(
-                        409,
-                        "Email já cadastrado",
-                        ex.getMessage(),
-                        OffsetDateTime.now()
-                ));
-    }
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ResponseEntity<ApiError> handleResourceNotFoundException (
+			ResourceNotFoundException ex) {
+		return ResponseEntity.status(ex.getStatus())
+				.body(new ApiError(
+						ex.getStatus().value(),
+						ex.getTitle(),
+						ex.getMessage(),
+						OffsetDateTime.now()));
+	}
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidation(

@@ -2,6 +2,7 @@ package com.bndesigner.service.usuario.impl;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,8 +10,9 @@ import com.bndesigner.domain.entity.usuario.Usuario;
 import com.bndesigner.dto.request.usuario.UsuarioCreateRequest;
 import com.bndesigner.dto.request.usuario.UsuarioUpdateRequest;
 import com.bndesigner.dto.response.usuario.UsuarioResponse;
-import com.bndesigner.exceptions.usuario.EmailJaCadastradoException;
-import com.bndesigner.exceptions.usuario.UsuarioNaoEncontradoException;
+import com.bndesigner.exceptions.BusinessException;
+import com.bndesigner.exceptions.ResourceNotFoundException;
+
 import com.bndesigner.mapper.usuario.UsuarioMapper;
 import com.bndesigner.repository.usuario.UsuarioRepository;
 import com.bndesigner.service.usuario.UsuarioService;
@@ -29,7 +31,11 @@ public class UsuarioServiceImpl implements UsuarioService{
 	public UsuarioResponse criar(UsuarioCreateRequest request) {
 		
 		if (usuarioRepository.existsByEmail(request.email())) {
-			throw new EmailJaCadastradoException(request.email());
+			throw new BusinessException(
+			        HttpStatus.CONFLICT,
+			        "Email já cadastrado",
+			        "O email " + request.email() + " já está em uso"
+			    );
 		}
 		
 		Usuario usuario = usuarioMapper.toEntity(request);
@@ -43,7 +49,11 @@ public class UsuarioServiceImpl implements UsuarioService{
 	public UsuarioResponse buscarPorId(Long id) {
 		
 		Usuario usuario = usuarioRepository.findById(id)
-				.orElseThrow(() -> new UsuarioNaoEncontradoException(id));
+				.orElseThrow(() -> new ResourceNotFoundException(
+					    HttpStatus.NOT_FOUND,
+					    "Usuário não encontrado",
+					    "Nenhum usuário encontrado com o id: " + id
+					));
 		
 		return usuarioMapper.toResponse(usuario);
 
@@ -62,11 +72,19 @@ public class UsuarioServiceImpl implements UsuarioService{
 	public UsuarioResponse atualizar(Long id, UsuarioUpdateRequest usuarioAtualizado) {
 		
 		Usuario usuario = usuarioRepository.findById(id)
-				.orElseThrow(() -> new UsuarioNaoEncontradoException(id));
+				.orElseThrow(() -> new ResourceNotFoundException(
+					    HttpStatus.NOT_FOUND,
+					    "Usuário não encontrado",
+					    "Nenhum usuário encontrado com o id: " + id
+					));
 		
 		if (!usuario.getEmail().equals(usuarioAtualizado.email())
 				&& usuarioRepository.existsByEmail(usuarioAtualizado.email())) {
-			throw new EmailJaCadastradoException(usuarioAtualizado.email());
+			throw new BusinessException(
+			        HttpStatus.CONFLICT,
+			        "Email já cadastrado",
+			        "O email " + usuarioAtualizado.email() + " já está em uso"
+			    );
 		}
 		
 		usuarioMapper.updateEntityFromRequest(usuarioAtualizado, usuario);
@@ -80,7 +98,11 @@ public class UsuarioServiceImpl implements UsuarioService{
 	public void deletar(Long id) {
 		
 		Usuario usuario = usuarioRepository.findById(id)
-				.orElseThrow(() -> new UsuarioNaoEncontradoException(id));
+				.orElseThrow(() -> new ResourceNotFoundException(
+					    HttpStatus.NOT_FOUND,
+					    "Usuário não encontrado",
+					    "Nenhum usuário encontrado com o id: " + id
+					));
 		
 		usuarioRepository.delete(usuario);
 		
