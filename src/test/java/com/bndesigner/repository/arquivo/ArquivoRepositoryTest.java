@@ -10,6 +10,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import com.bndesigner.domain.entity.arquivo.Arquivo;
 
@@ -51,7 +54,8 @@ class ArquivoRepositoryTest {
     @Test
     @DisplayName("findByAtivoTrue() — deve retornar apenas arquivos com ativo=true")
     void findByAtivoTrue_retornaSomenteAtivos() {
-        List<Arquivo> ativos = repository.findByAtivoTrue();
+    	Pageable pageable = PageRequest.of(0, 10);
+        Page<Arquivo> ativos = repository.findByAtivoTrue(pageable);
  
         assertThat(ativos).hasSize(2);
         assertThat(ativos).extracting(Arquivo::getAtivo).containsOnly(true);
@@ -67,7 +71,8 @@ class ArquivoRepositoryTest {
             repository.save(a);
         });
  
-        assertThat(repository.findByAtivoTrue()).isEmpty();
+        Pageable pageable = PageRequest.of(0, 10);
+        assertThat(repository.findByAtivoTrue(pageable)).isEmpty();
     }
  
     // ─── findByHashArquivo() ────────────────────────────────────────────────────
@@ -132,7 +137,7 @@ class ArquivoRepositoryTest {
     @Test
     @DisplayName("findById() — deve encontrar arquivo por ID após salvar")
     void findById_idExistente_retornaArquivo() {
-        Optional<Arquivo> result = repository.findById(ativo1.getId());
+        Optional<Arquivo> result = repository.findById(ativo1.getIdArquivo());
  
         assertThat(result).isPresent();
         assertThat(result.get().getHashArquivo()).isEqualTo("hash-a");
@@ -144,7 +149,7 @@ class ArquivoRepositoryTest {
         ativo1.setAtivo(false);
         repository.save(ativo1);
  
-        Arquivo atualizado = repository.findById(ativo1.getId()).orElseThrow();
+        Arquivo atualizado = repository.findById(ativo1.getIdArquivo()).orElseThrow();
         assertThat(atualizado.getAtivo()).isFalse();
     }
 }

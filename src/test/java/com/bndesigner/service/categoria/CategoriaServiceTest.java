@@ -54,7 +54,7 @@ public class CategoriaServiceTest {
     @BeforeEach
     void setUp() {
         categoriaEntity = Categoria.builder()
-                .id(1L)
+                .idCategoria(1L)
                 .nome("Banners")
                 .build();
 
@@ -83,7 +83,7 @@ public class CategoriaServiceTest {
 
             CategoriaResponse resultado = categoriaServiceImpl.criar(request);
 
-            assertThat(resultado.id()).isEqualTo(1L);
+            assertThat(resultado.idCategoria()).isEqualTo(1L);
             assertThat(resultado.nome()).isEqualTo("Banners");
             verify(categoriaRepository).save(categoriaParaSalvar);
             verify(categoriaMapper).toResponse(categoriaEntity);
@@ -122,7 +122,7 @@ public class CategoriaServiceTest {
 
             CategoriaResponse resultado = categoriaServiceImpl.buscarPorId(1L);
 
-            assertThat(resultado.id()).isEqualTo(1L);
+            assertThat(resultado.idCategoria()).isEqualTo(1L);
             assertThat(resultado.nome()).isEqualTo("Banners");
             verify(categoriaRepository).findById(1L);
             verify(categoriaMapper).toResponse(categoriaEntity);
@@ -195,7 +195,7 @@ public class CategoriaServiceTest {
 
             CategoriaUpdateRequest request = new CategoriaUpdateRequest("Banners", "Nova desc");
 
-            Categoria atualizada = Categoria.builder().id(1L).nome("Banners").build();
+            Categoria atualizada = Categoria.builder().idCategoria(1L).nome("Banners").build();
             CategoriaResponse responseAtualizado = new CategoriaResponse(1L, "Banners", "Nova desc");
 
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaEntity));
@@ -216,7 +216,7 @@ public class CategoriaServiceTest {
 
             CategoriaUpdateRequest request = new CategoriaUpdateRequest("Faixas", "Nova desc");
 
-            Categoria atualizada = Categoria.builder().id(1L).nome("Faixas").build();
+            Categoria atualizada = Categoria.builder().idCategoria(1L).nome("Faixas").build();
             CategoriaResponse responseAtualizado = new CategoriaResponse(1L, "Faixas", "Nova desc");
 
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaEntity));

@@ -24,7 +24,7 @@ public class Arquivo {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long idArquivo;
 	
 	@Column(nullable = false, length = 225)
 	private String caminhoArquivo;
