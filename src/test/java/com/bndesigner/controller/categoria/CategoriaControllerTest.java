@@ -64,7 +64,7 @@ class CategoriaControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRequestFixture())))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.idCategoria").value(1L))
                 .andExpect(jsonPath("$.nome").value("Eletrônicos"))
                 .andExpect(jsonPath("$.descricao").value("Produtos eletrônicos em geral"));
 
@@ -140,7 +140,7 @@ class CategoriaControllerTest {
 
         mockMvc.perform(get("/api/categorias/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.idCategoria").value(1L))
                 .andExpect(jsonPath("$.nome").value("Eletrônicos"))
                 .andExpect(jsonPath("$.descricao").value("Produtos eletrônicos em geral"));
 
@@ -178,7 +178,7 @@ class CategoriaControllerTest {
                         .param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].id").value(1L))
+                .andExpect(jsonPath("$.content[0].idCategoria").value(1L))
                 .andExpect(jsonPath("$.totalElements").value(1));
 
         verify(categoriaService).listar(any());
@@ -209,7 +209,7 @@ class CategoriaControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequestFixture())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.idCategoria").value(1L))
                 .andExpect(jsonPath("$.nome").value("Eletrônicos Atualizado"))
                 .andExpect(jsonPath("$.descricao").value("Descrição atualizada"));
 
