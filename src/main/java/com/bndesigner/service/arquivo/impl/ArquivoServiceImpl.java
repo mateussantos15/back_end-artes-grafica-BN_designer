@@ -15,6 +15,7 @@ import com.bndesigner.mapper.arquivo.ArquivoMapper;
 import com.bndesigner.repository.arquivo.ArquivoRepository;
 import com.bndesigner.service.arquivo.ArquivoService;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 
@@ -26,6 +27,7 @@ public class ArquivoServiceImpl implements ArquivoService {
 	private final ArquivoMapper arquivoMapper;
 
 	@Override
+	@Transactional
 	public ArquivoResponse criar(ArquivoCreateRequest creatRequest) {
 		
 		if(creatRequest.hashArquivo() != null &&
@@ -44,6 +46,7 @@ public class ArquivoServiceImpl implements ArquivoService {
 	}
 
 	@Override
+	@Transactional
 	public ArquivoResponse buscarPorId(Long id) {
 		
 		Arquivo entity = arquivoRepository.findById(id)
@@ -55,6 +58,7 @@ public class ArquivoServiceImpl implements ArquivoService {
 	}
 
 	@Override
+	@Transactional
 	public Page<ArquivoResponse> listarAtivos(Pageable pageable) {
 		
 		return arquivoRepository.findByAtivoTrue(pageable)
@@ -62,6 +66,7 @@ public class ArquivoServiceImpl implements ArquivoService {
 	}
 
 	@Override
+	@Transactional
 	public ArquivoResponse atualizar(Long id, ArquivoUpdateRequest updateRequest) {
 		
 		Arquivo entity = arquivoRepository.findById(id)
@@ -76,6 +81,7 @@ public class ArquivoServiceImpl implements ArquivoService {
 	}
 
 	@Override
+	@Transactional
 	public void desativar(Long id) {
 		
 		Arquivo entity = arquivoRepository.findById(id)
