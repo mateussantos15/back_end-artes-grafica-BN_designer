@@ -215,10 +215,7 @@ class ArquivoControllerTest {
         void deveRetornar404QuandoNaoEncontrado() throws Exception {
 
             when(arquivoService.buscarPorId(99L))
-                    .thenThrow(new ResourceNotFoundException(
-                            HttpStatus.NOT_FOUND,
-                            "Arquivo não encontrado!",
-                            "Nenhuma Arquivo encontrado com o id: 99"));
+                    .thenThrow(buscarEntidadePorId(99L));
 
             mockMvc.perform(get("/api/arquivos/99"))
                     .andExpect(status().isNotFound());
@@ -341,10 +338,7 @@ class ArquivoControllerTest {
         void deveRetornar404AoAtualizarInexistente() throws Exception {
 
             when(arquivoService.atualizar(eq(99L), any(ArquivoUpdateRequest.class)))
-                    .thenThrow(new ResourceNotFoundException(
-                            HttpStatus.NOT_FOUND,
-                            "Arquivo não encontrado!",
-                            "Nenhuma Arquivo encontrado com o id: 99"));
+                    .thenThrow(buscarEntidadePorId(99L));
 
             mockMvc.perform(put("/api/arquivos/99")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -373,10 +367,7 @@ class ArquivoControllerTest {
         @DisplayName("deve retornar 404 ao desativar arquivo inexistente")
         void deveRetornar404AoDesativarInexistente() throws Exception {
 
-            doThrow(new ResourceNotFoundException(
-                    HttpStatus.NOT_FOUND,
-                    "Arquivo não encontrado!",
-                    "Nenhuma Arquivo encontrado com o id: 99"))
+            doThrow(buscarEntidadePorId(99L))
                     .when(arquivoService).desativar(99L);
 
             mockMvc.perform(patch("/api/arquivos/99/desativar"))
@@ -385,5 +376,9 @@ class ArquivoControllerTest {
             verify(arquivoService, times(1)).desativar(99L);
         }
     }
+    
+    private ResourceNotFoundException buscarEntidadePorId(Long id) {
+		return new ResourceNotFoundException("Arquivo", id);
+	}
     
 }

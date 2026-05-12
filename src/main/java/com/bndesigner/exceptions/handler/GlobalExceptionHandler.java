@@ -1,8 +1,6 @@
 package com.bndesigner.exceptions.handler;
 
 import com.bndesigner.exceptions.BusinessException;
-import com.bndesigner.exceptions.ResourceNotFoundException;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,17 +14,6 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(BusinessException.class)
 	public ResponseEntity<ApiError> handleBusinessException (
 			BusinessException ex) {
-		return ResponseEntity.status(ex.getStatus())
-				.body(new ApiError(
-						ex.getStatus().value(),
-						ex.getTitle(),
-						ex.getMessage(),
-						OffsetDateTime.now()));
-	}
-
-	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<ApiError> handleResourceNotFoundException (
-			ResourceNotFoundException ex) {
 		return ResponseEntity.status(ex.getStatus())
 				.body(new ApiError(
 						ex.getStatus().value(),
@@ -53,5 +40,5 @@ public class GlobalExceptionHandler {
                         message,
                         OffsetDateTime.now()
                 ));
-    }
+    }    
 }

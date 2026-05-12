@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.bndesigner.domain.entity.arquivo.Arquivo;
 import com.bndesigner.dto.request.arquivo.ArquivoCreateRequest;
@@ -15,7 +16,7 @@ import com.bndesigner.mapper.arquivo.ArquivoMapper;
 import com.bndesigner.repository.arquivo.ArquivoRepository;
 import com.bndesigner.service.arquivo.ArquivoService;
 
-import jakarta.transaction.Transactional;
+
 import lombok.AllArgsConstructor;
 
 
@@ -27,7 +28,6 @@ public class ArquivoServiceImpl implements ArquivoService {
 	private final ArquivoMapper arquivoMapper;
 
 	@Override
-	@Transactional
 	public ArquivoResponse criar(ArquivoCreateRequest creatRequest) {
 		
 		if(creatRequest.hashArquivo() != null &&
@@ -46,19 +46,16 @@ public class ArquivoServiceImpl implements ArquivoService {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public ArquivoResponse buscarPorId(Long id) {
 		
-		Arquivo entity = arquivoRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException(
-						HttpStatus.NOT_FOUND, "Arquivo não encontrado!", 
-						"Nenhuma Arquivo encontrado com o id: " + id));
+		Arquivo entity = buscarEntidadePorId(id);
 		
 		return arquivoMapper.toResponse(entity);
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Page<ArquivoResponse> listarAtivos(Pageable pageable) {
 		
 		return arquivoRepository.findByAtivoTrue(pageable)
@@ -66,14 +63,9 @@ public class ArquivoServiceImpl implements ArquivoService {
 	}
 
 	@Override
-	@Transactional
 	public ArquivoResponse atualizar(Long id, ArquivoUpdateRequest updateRequest) {
 		
-		Arquivo entity = arquivoRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException(
-						HttpStatus.NOT_FOUND,
-						"Arquivo não encontrado!",
-						"Nenhuma Arquivo encontrado com o id: " + id));
+		Arquivo entity = buscarEntidadePorId(id);
 		
 		arquivoMapper.updateEntityFromRequest(updateRequest, entity);		
 		
@@ -81,19 +73,19 @@ public class ArquivoServiceImpl implements ArquivoService {
 	}
 
 	@Override
-	@Transactional
 	public void desativar(Long id) {
 		
-		Arquivo entity = arquivoRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException(
-						HttpStatus.NOT_FOUND,
-						"Arquivo não encontrado!",
-						"Nenhuma Arquivo encontrado com o id: " + id));
+		Arquivo entity = buscarEntidadePorId(id);
 		
 		entity.setAtivo(false);
 		
 		arquivoRepository.save(entity);
 		
+	}
+	
+	private Arquivo buscarEntidadePorId(Long id) {
+		return arquivoRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Arquivo", id));
 	}
 
 }

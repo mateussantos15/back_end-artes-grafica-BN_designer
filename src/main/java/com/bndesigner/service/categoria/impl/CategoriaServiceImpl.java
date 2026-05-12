@@ -30,12 +30,7 @@ public class CategoriaServiceImpl implements CategoriaService {
 	@Transactional
 	public CategoriaResponse criar(CategoriaCreateRequest request) {
 		
-		if (categoriaRepository.existsByNome(request.nome())) {
-			throw new BusinessException(
-					HttpStatus.CONFLICT,
-					"Nome já cadastrado",
-					"Já existe uma categoria com o nome: " + request.nome());
-		}
+		validarNomeCategoria(request.nome(), null);
 		
 		Categoria categoria = categoriaMapper.toEntity(request);
 		Categoria salvo = categoriaRepository.save(categoria);
@@ -48,11 +43,7 @@ public class CategoriaServiceImpl implements CategoriaService {
 	@Transactional(readOnly = true)
 	public CategoriaResponse buscarPorId(Long id) {
 		
-		Categoria categoria = categoriaRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException(
-						HttpStatus.NOT_FOUND,
-						"Categoria não encontrada!",
-						"Nenhuma categoria encontrada com o id: " +id));
+		Categoria categoria = buscarEntidadePorId(id);
 		
 		return categoriaMapper.toResponse(categoria);
 	}
@@ -69,19 +60,9 @@ public class CategoriaServiceImpl implements CategoriaService {
 	@Override
 	public CategoriaResponse atualizar(Long id, CategoriaUpdateRequest categoriaAtualizada) {
 		
-		Categoria categoria = categoriaRepository.findById(id)
-				.orElseThrow(() -> new BusinessException(
-						HttpStatus.NOT_FOUND,
-						"Categoria não encontrada!",
-						"Nenhuma categoria encontrada com o id: " +id));
+		Categoria categoria = buscarEntidadePorId(id);
 		
-		if(!categoria.getNome().equals(categoriaAtualizada.nome())
-				&& categoriaRepository.existsByNome(categoriaAtualizada.nome())) {
-			throw new BusinessException(
-					HttpStatus.CONFLICT,
-					"Nome já cadastrado",
-					"Já existe uma categoria com o nome: " + categoriaAtualizada.nome());
-		}
+		validarNomeCategoria(categoriaAtualizada.nome(), id);
 		
 		categoriaMapper.updateEntityFromRequest(categoriaAtualizada, categoria);
 		Categoria atualizado = categoriaRepository.save(categoria);
@@ -92,14 +73,43 @@ public class CategoriaServiceImpl implements CategoriaService {
 	@Override
 	public void deletar(Long id) {
 		
-		Categoria categoria = categoriaRepository.findById(id)
-				.orElseThrow(() -> new BusinessException(
-						HttpStatus.NOT_FOUND,
-						"Categoria não encontrada!",
-						"Nenhuma categoria encontrada com o id: " +id));
-		
+		Categoria categoria = buscarEntidadePorId(id);
 		categoriaRepository.delete(categoria);
 		
 	}
-
+	
+	
+	
+	private Categoria buscarEntidadePorId(Long id) {
+		
+		return categoriaRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException(
+						"Categoria", id));	
+	}
+	
+	
+	private void validarNomeCategoria(String nome, Long id) {
+		
+		
+		if (id != null) {
+			
+			boolean ehOMesmoNome = categoriaRepository.findById(id)
+					.map(c -> c.getNome().equalsIgnoreCase(nome))
+					.orElse(false);
+			
+			if (ehOMesmoNome) return;
+			
+		}
+		
+		boolean nomeEmUso = categoriaRepository.existsByNome(nome);
+		
+		if (nomeEmUso) {
+			
+			throw new BusinessException(
+					HttpStatus.CONFLICT,
+					"Conflito de Dados",
+					String.format("Já existe uma Categoria com o nome: '%s'.", nome)
+					);
+		}			
+	}
 }

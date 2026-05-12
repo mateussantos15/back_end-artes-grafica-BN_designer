@@ -14,7 +14,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -151,10 +150,7 @@ class CategoriaControllerTest {
     @DisplayName("GET /api/categorias/{id} quando não encontrado → 404 Not Found")
     void buscarPorId_quandoNaoEncontrado_deveRetornar404() throws Exception {
         when(categoriaService.buscarPorId(99L))
-                .thenThrow(new ResourceNotFoundException(
-						HttpStatus.NOT_FOUND,
-						"Categoria não encontrada!",
-						"Nenhuma categoria encontrada com o id: " + 99L));
+                .thenThrow(buscarEntidadePorId(99L));
 
         mockMvc.perform(get("/api/categorias/99"))
                 .andExpect(status().isNotFound());
@@ -260,10 +256,7 @@ class CategoriaControllerTest {
     @Test
     @DisplayName("DELETE /api/categorias/{id} quando não encontrado → 404 Not Found")
     void remover_quandoNaoEncontrado_deveRetornar404() throws Exception {
-        doThrow(new ResourceNotFoundException(
-				HttpStatus.NOT_FOUND,
-				"Categoria não encontrada!",
-				"Nenhuma categoria encontrada com o id: " + 99L))
+        doThrow(buscarEntidadePorId(99L))
                 .when(categoriaService).deletar(99L);
 
         mockMvc.perform(delete("/api/categorias/99"))
@@ -271,4 +264,8 @@ class CategoriaControllerTest {
 
         verify(categoriaService).deletar(99L);
     }
+    
+    private ResourceNotFoundException buscarEntidadePorId(Long id) {
+		return new ResourceNotFoundException("Arquivo", id);
+	}
 }

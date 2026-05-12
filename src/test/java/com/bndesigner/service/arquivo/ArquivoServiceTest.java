@@ -57,7 +57,6 @@ class ArquivoServiceTest {
     private Arquivo arquivoAtivo;
     private ArquivoResponse arquivoResponse;
     private ArquivoCreateRequest creatRequest;
-    private ArquivoCreateRequest creatRequestSemHash;
     private ArquivoUpdateRequest updateRequest;
 
     private static final Long ID_EXISTENTE   = 1L;
@@ -79,7 +78,7 @@ class ArquivoServiceTest {
         );
 
         creatRequest = mock(ArquivoCreateRequest.class);
-        creatRequestSemHash = mock(ArquivoCreateRequest.class);
+        mock(ArquivoCreateRequest.class);
         updateRequest = mock(ArquivoUpdateRequest.class);
     }
 

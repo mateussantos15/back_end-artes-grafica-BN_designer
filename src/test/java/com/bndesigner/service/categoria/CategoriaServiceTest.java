@@ -100,7 +100,7 @@ public class CategoriaServiceTest {
 
             assertThatThrownBy(() -> categoriaServiceImpl.criar(request))
                     .isInstanceOf(BusinessException.class)
-                    .hasMessage("Já existe uma categoria com o nome: Banners");
+                    .hasMessage(String.format("Já existe uma Categoria com o nome: '%s'.", request.nome()));
 
             verify(categoriaRepository, never()).save(any());
             verify(categoriaMapper, never()).toEntity(any());
@@ -136,7 +136,8 @@ public class CategoriaServiceTest {
 
             assertThatThrownBy(() -> categoriaServiceImpl.buscarPorId(99L))
                     .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage("Nenhuma categoria encontrada com o id: " + 99L);
+                    .hasMessage(String.format("%s com identificador '%s' não foi encontrado.", 
+                    		"Categoria", 99L));
 
             verify(categoriaMapper, never()).toResponse(any());
         }
@@ -243,7 +244,7 @@ public class CategoriaServiceTest {
 
             assertThatThrownBy(() -> categoriaServiceImpl.atualizar(1L, request))
                     .isInstanceOf(BusinessException.class)
-                    .hasMessage("Já existe uma categoria com o nome: Faixas");
+                    .hasMessage(String.format("Já existe uma Categoria com o nome: '%s'.", request.nome()));
 
             verify(categoriaRepository, never()).save(any());
             verify(categoriaMapper, never()).updateEntityFromRequest(any(), any());
@@ -259,7 +260,8 @@ public class CategoriaServiceTest {
 
             assertThatThrownBy(() -> categoriaServiceImpl.atualizar(99L, request))
                     .isInstanceOf(BusinessException.class)
-                    .hasMessage("Nenhuma categoria encontrada com o id: " + 99L);
+                    .hasMessage(String.format("%s com identificador '%s' não foi encontrado.", 
+                    		"Categoria", 99L));
 
             verify(categoriaRepository, never()).save(any());
         }
@@ -291,7 +293,8 @@ public class CategoriaServiceTest {
 
             assertThatThrownBy(() -> categoriaServiceImpl.deletar(99L))
                     .isInstanceOf(BusinessException.class)
-                    .hasMessage("Nenhuma categoria encontrada com o id: " + 99);
+                    .hasMessage(String.format("%s com identificador '%s' não foi encontrado.", 
+                    		"Categoria", 99L));
 
             verify(categoriaRepository, never()).delete(any());
         }
