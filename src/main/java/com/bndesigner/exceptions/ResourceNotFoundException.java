@@ -2,17 +2,14 @@ package com.bndesigner.exceptions;
 
 import org.springframework.http.HttpStatus;
 
-public class ResourceNotFoundException extends RuntimeException {
-	private final HttpStatus status;
-	private final String title;
+public class ResourceNotFoundException extends BusinessException {
 	
-	public ResourceNotFoundException (HttpStatus status, String title, String detail) {
-		super(detail);
-		this.status = status;
-		this.title = title;
+	public ResourceNotFoundException(String resourceName, Object identifier) {
+		super(HttpStatus.NOT_FOUND, 
+				"Recurso Não Encontrado",
+                String.format("%s com identificador '%s' não foi encontrado.", 
+                		resourceName, identifier)
+                );
 	}
-	
-	public HttpStatus getStatus() { return status; }
-	public String getTitle() { return title; }
 
 }

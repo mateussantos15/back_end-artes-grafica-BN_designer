@@ -30,13 +30,7 @@ public class UsuarioServiceImpl implements UsuarioService{
 	@Transactional
 	public UsuarioResponse criar(UsuarioCreateRequest request) {
 		
-		if (usuarioRepository.existsByEmail(request.email())) {
-			throw new BusinessException(
-			        HttpStatus.CONFLICT,
-			        "Email já cadastrado",
-			        "O email " + request.email() + " já está em uso"
-			    );
-		}
+		validarEmail(null, request.email());
 		
 		Usuario usuario = usuarioMapper.toEntity(request);
 		Usuario salvo = usuarioRepository.save(usuario);
@@ -48,13 +42,7 @@ public class UsuarioServiceImpl implements UsuarioService{
 	@Transactional(readOnly = true)
 	public UsuarioResponse buscarPorId(Long id) {
 		
-		Usuario usuario = usuarioRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException(
-					    HttpStatus.NOT_FOUND,
-					    "Usuário não encontrado",
-					    "Nenhum usuário encontrado com o id: " + id
-					));
-		
+		Usuario usuario = buscarUsuarioPorId(id);		
 		return usuarioMapper.toResponse(usuario);
 
 	}
@@ -71,40 +59,51 @@ public class UsuarioServiceImpl implements UsuarioService{
 	@Transactional
 	public UsuarioResponse atualizar(Long id, UsuarioUpdateRequest usuarioAtualizado) {
 		
-		Usuario usuario = usuarioRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException(
-					    HttpStatus.NOT_FOUND,
-					    "Usuário não encontrado",
-					    "Nenhum usuário encontrado com o id: " + id
-					));
+		Usuario usuario = buscarUsuarioPorId(id);
 		
-		if (!usuario.getEmail().equals(usuarioAtualizado.email())
-				&& usuarioRepository.existsByEmail(usuarioAtualizado.email())) {
-			throw new BusinessException(
-			        HttpStatus.CONFLICT,
-			        "Email já cadastrado",
-			        "O email " + usuarioAtualizado.email() + " já está em uso"
-			    );
-		}
+		validarEmail(id, usuarioAtualizado.email());
 		
 		usuarioMapper.updateEntityFromRequest(usuarioAtualizado, usuario);
 		
 		Usuario salvo = usuarioRepository.save(usuario);
 		return usuarioMapper.toResponse(salvo);
 	}
+	
 
 	@Override
 	@Transactional
 	public void deletar(Long id) {
 		
-		Usuario usuario = usuarioRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException(
-					    HttpStatus.NOT_FOUND,
-					    "Usuário não encontrado",
-					    "Nenhum usuário encontrado com o id: " + id
-					));
+		Usuario usuario = buscarUsuarioPorId(id);
 		
 		usuarioRepository.delete(usuario);
+		
+	}
+	
+	
+	private Usuario buscarUsuarioPorId(Long id) {
+		return usuarioRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Usuario", id));
+	}
+	
+private void validarEmail(Long id, String email) {
+		
+		boolean emailEmUso = usuarioRepository.existsByEmail(email);
+		
+		if (emailEmUso) {
+			boolean ehOMesmoEmail = id != null
+					&& usuarioRepository.findByEmail(email)
+					.map(u -> u.getIdUsuario().equals(id))
+					.orElse(false);
+			
+			if (!ehOMesmoEmail) {
+				throw new BusinessException(HttpStatus.CONFLICT,
+			        "Email já cadastrado",
+			        "O email " + email + " já está em uso"
+			    );
+			}
+			
+		}
 		
 	}
 
