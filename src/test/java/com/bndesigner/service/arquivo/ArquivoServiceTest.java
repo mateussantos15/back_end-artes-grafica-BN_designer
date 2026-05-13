@@ -74,6 +74,7 @@ class ArquivoServiceTest {
                 "https://storage.example.com/arquivo-teste.pdf",
                 HASH_UNICO,
                 LocalDateTime.of(2025, 1, 15, 10, 0),
+                LocalDateTime.of(2025, 10, 3, 10, 0),
                 true
         );
 

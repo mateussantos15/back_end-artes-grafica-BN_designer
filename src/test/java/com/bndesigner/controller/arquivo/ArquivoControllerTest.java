@@ -73,6 +73,7 @@ class ArquivoControllerTest {
                 "/uploads/documentos/arquivo.pdf",
                 "hash-abc123",
                 LocalDateTime.of(2025, 1, 15, 10, 30),
+                LocalDateTime.of(2025, 10, 3, 10, 00),
                 true
         );
     }
@@ -113,7 +114,8 @@ class ArquivoControllerTest {
             ArquivoCreateRequest request = buildCreateRequestSemHash();
             ArquivoResponse response = new ArquivoResponse(
                     2L, "/uploads/documentos/arquivo.pdf", null,
-                    LocalDateTime.of(2025, 1, 15, 10, 30), true);
+                    LocalDateTime.of(2025, 1, 15, 10, 30),
+                    LocalDateTime.of(2025, 10, 3, 10, 00),true);
 
             when(arquivoService.criar(any(ArquivoCreateRequest.class))).thenReturn(response);
 

@@ -8,6 +8,7 @@ public record ArquivoResponse(
 		String caminhoArquivo,
 		String hashArquivo,
 		LocalDateTime dataUpload,
+		LocalDateTime dataAtualizacao,
 		Boolean ativo
 		
 		) {}

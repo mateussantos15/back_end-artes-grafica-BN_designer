@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Optional;
 
+import com.bndesigner.config.JpaAuditingConfig;
 import com.bndesigner.domain.entity.usuario.Usuario;
 import com.bndesigner.domain.enums.usuario.TipoUsuario;
 
@@ -15,11 +16,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
 //@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 @ActiveProfiles("test")
+@Import(JpaAuditingConfig.class)
 class UsuarioRepositoryTest {
 
     @Autowired

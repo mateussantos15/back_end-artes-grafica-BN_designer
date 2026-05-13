@@ -11,16 +11,19 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import com.bndesigner.config.JpaAuditingConfig;
 import com.bndesigner.domain.entity.arquivo.Arquivo;
 import com.bndesigner.domain.entity.categoria.Categoria;
 import com.bndesigner.domain.entity.produto.Produto;
 import com.bndesigner.repository.arquivo.ArquivoRepository;
 import com.bndesigner.repository.categoria.CategoriaRepository;
 
+@Import(JpaAuditingConfig.class)
 @DataJpaTest
 @DisplayName("ProdutoRepository")
 class ProdutoRepositoryTest {
