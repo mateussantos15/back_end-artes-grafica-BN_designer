@@ -104,6 +104,7 @@ class ProdutoServiceImplTest {
                 "Logotipo profissional",
                 new BigDecimal("49.90"),
                 LocalDateTime.now(),
+                LocalDateTime.of(2026, 10, 3, 10, 0),
                 1L,
                 "Design",
                 10L
@@ -173,7 +174,8 @@ class ProdutoServiceImplTest {
             Produto produto = produtoFake();
             ProdutoResponse response = new ProdutoResponse(
                     100L, "Logo Premium", "Logotipo profissional",
-                    new BigDecimal("49.90"), LocalDateTime.now(), 1L, "Design", null);
+                    new BigDecimal("49.90"), LocalDateTime.now(), 
+                    LocalDateTime.of(2026, 10, 3, 10, 0), 1L, "Design", null);
 
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
             when(mapper.toEntity(request)).thenReturn(produto);
@@ -434,7 +436,8 @@ class ProdutoServiceImplTest {
             Categoria categoria = categoriaFake();
             ProdutoResponse response = new ProdutoResponse(
                     100L, "Logo Atualizado", "Nova descrição",
-                    new BigDecimal("59.90"), LocalDateTime.now(), 1L, "Design", null);
+                    new BigDecimal("59.90"), LocalDateTime.now(), 
+                    LocalDateTime.of(2026, 10, 3, 10, 0), 1L, "Design", null);
 
             when(repository.findById(100L)).thenReturn(Optional.of(produto));
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));

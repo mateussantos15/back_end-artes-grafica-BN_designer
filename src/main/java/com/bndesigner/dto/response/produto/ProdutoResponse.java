@@ -10,10 +10,9 @@ public record ProdutoResponse(
         String descricao,
         BigDecimal preco,
         LocalDateTime dataCadastro,
-
+        LocalDateTime dataAtualizacao,
         Long categoriaId,
         String categoriaNome,
-
         Long arquivoId
         
 		) {}
