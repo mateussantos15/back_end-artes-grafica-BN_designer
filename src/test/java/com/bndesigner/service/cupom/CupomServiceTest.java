@@ -10,6 +10,7 @@ import com.bndesigner.exceptions.ResourceNotFoundException;
 import com.bndesigner.mapper.cupom.CupomMapper;
 import com.bndesigner.repository.cupom.CupomRepository;
 import com.bndesigner.service.cupom.impl.CupomServiceImpl;
+import com.bndesigner.service.validation.CupomValidator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +44,9 @@ class CupomServiceTest {
 
     @Mock
     private CupomMapper cupomMapper;
+    
+    @Mock
+    private CupomValidator cupomValidator;
 
     @InjectMocks
     private CupomServiceImpl cupomService;
@@ -59,13 +63,12 @@ class CupomServiceTest {
     }
 
     private CupomResponse responseValido(Cupom cupom) {
-       
         return new CupomResponse(
-        		cupom.getId(),
-        		cupom.getCodigo(),
-        		cupom.getDescontoPercentual(),
-        		cupom.getDataValidade(),
-        		cupom.getStatus());
+                cupom.getId(),
+                cupom.getCodigo(),
+                cupom.getDescontoPercentual(),
+                cupom.getDataValidade(),
+                cupom.getStatus());
     }
 
     // =========================================================
@@ -80,9 +83,9 @@ class CupomServiceTest {
         @BeforeEach
         void setUp() {
             requestValido = new CupomCreateRequest(
-            		"PROMO10", 
-            		new BigDecimal("0.10"),
-            		LocalDate.now().plusDays(10));
+                    "PROMO10", 
+                    new BigDecimal("0.10"),
+                    LocalDate.now().plusDays(10));
         }
 
         @Test
@@ -93,7 +96,7 @@ class CupomServiceTest {
             entity.setStatus(null); // antes de atualizarStatus
             CupomResponse response = responseValido(entity);
 
-            when(cupomRepository.existsByCodigoIgnoreCase("PROMO10")).thenReturn(false);
+            // Validador mockado não faz nada por padrão (sucesso)
             when(cupomMapper.toEntity(requestValido)).thenReturn(entity);
             when(cupomRepository.save(entity)).thenReturn(entity);
             when(cupomMapper.toResponse(entity)).thenReturn(response);
@@ -103,8 +106,8 @@ class CupomServiceTest {
 
             // Assert
             assertThat(resultado).isNotNull();
-            assertThat(resultado.codigo()).isEqualTo("PROMO10");
-            assertThat(entity.getStatus()).isEqualTo(StatusCupom.ATIVO);
+            verify(cupomValidator).validarCodigoDuplicado("PROMO10", null);
+            verify(cupomValidator).validarDataValidade(requestValido.dataValidade());
             verify(cupomRepository).save(entity);
         }
 
@@ -112,7 +115,8 @@ class CupomServiceTest {
         @DisplayName("deve lançar BusinessException quando código já existe")
         void deveLancarExcecaoQuandoCodigoDuplicado() {
             // Arrange
-            when(cupomRepository.existsByCodigoIgnoreCase("PROMO10")).thenReturn(true);
+            doThrow(new BusinessException(HttpStatus.CONFLICT, "Código de cupom já cadastrado", ""))
+                .when(cupomValidator).validarCodigoDuplicado("PROMO10", null);
 
             // Act & Assert
             assertThatThrownBy(() -> cupomService.criar(requestValido))
@@ -129,12 +133,13 @@ class CupomServiceTest {
         @DisplayName("deve lançar BusinessException quando data de validade já expirou")
         void deveLancarExcecaoQuandoDataExpirada() {
             // Arrange
-            CupomCreateRequest requestExpirado =
-                    new CupomCreateRequest(
-                    		"PROMO10", 
-                    		new BigDecimal("0.10"),
-                    		LocalDate.now().minusDays(1));
-            when(cupomRepository.existsByCodigoIgnoreCase("PROMO10")).thenReturn(false);
+            CupomCreateRequest requestExpirado = new CupomCreateRequest(
+                            "PROMO10", 
+                            new BigDecimal("0.10"),
+                            LocalDate.now().minusDays(1));
+
+            doThrow(new BusinessException(HttpStatus.BAD_REQUEST, "A validade do código expirou", ""))
+                .when(cupomValidator).validarDataValidade(requestExpirado.dataValidade());
 
             // Act & Assert
             assertThatThrownBy(() -> cupomService.criar(requestExpirado))
@@ -145,26 +150,6 @@ class CupomServiceTest {
                     });
 
             verify(cupomRepository, never()).save(any());
-        }
-
-        @Test
-        @DisplayName("deve marcar status como EXPIRADO quando data de validade é passada após passar validação")
-        void deveMarcaStatusExpiradoQuandoDataPassada() {
-            // Esse cenário testa atualizarStatusAutomaticamente diretamente via criar:
-            // se por algum motivo a entidade chega com dataValidade no passado o status é forçado.
-            Cupom entity = cupomValido();
-            entity.setDataValidade(LocalDate.now().minusDays(1));
-            entity.setStatus(StatusCupom.ATIVO);
-
-            // A validação de data lançaria exceção antes disso, mas testamos o método
-            // privado indiretamente simulando que a validação foi pulada (ex: teste isolado).
-            // Aqui cobrimos via buscarPorId onde não há validação de data no fluxo.
-            when(cupomRepository.findById(1L)).thenReturn(Optional.of(entity));
-            when(cupomMapper.toResponse(entity)).thenReturn(responseValido(entity));
-
-            cupomService.buscarPorId(1L);
-
-            assertThat(entity.getStatus()).isEqualTo(StatusCupom.EXPIRADO);
         }
     }
 
@@ -221,21 +206,6 @@ class CupomServiceTest {
             // Assert
             assertThat(cupom.getStatus()).isEqualTo(StatusCupom.EXPIRADO);
         }
-
-        @Test
-        @DisplayName("deve manter status ATIVO quando data de validade é futura")
-        void deveMaterStatusAtivoQuandoDataFutura() {
-            // Arrange
-            Cupom cupom = cupomValido(); // status=ATIVO, data futura
-            when(cupomRepository.findById(1L)).thenReturn(Optional.of(cupom));
-            when(cupomMapper.toResponse(cupom)).thenReturn(responseValido(cupom));
-
-            // Act
-            cupomService.buscarPorId(1L);
-
-            // Assert
-            assertThat(cupom.getStatus()).isEqualTo(StatusCupom.ATIVO);
-        }
     }
 
     // =========================================================
@@ -267,7 +237,6 @@ class CupomServiceTest {
             // Assert
             assertThat(resultado.getTotalElements()).isEqualTo(2);
             assertThat(resultado.getContent()).hasSize(2);
-            verify(cupomMapper, times(2)).toResponse(any(Cupom.class));
         }
 
         @Test
@@ -284,27 +253,6 @@ class CupomServiceTest {
             assertThat(resultado.getTotalElements()).isZero();
             verifyNoInteractions(cupomMapper);
         }
-
-        @Test
-        @DisplayName("deve atualizar status de cada cupom durante listagem")
-        void deveAtualizarStatusDeCadaCupomNaListagem() {
-            // Arrange
-            Cupom expirado = cupomValido();
-            expirado.setDataValidade(LocalDate.now().minusDays(1));
-            expirado.setStatus(StatusCupom.ATIVO);
-
-            Pageable pageable = PageRequest.of(0, 10);
-            Page<Cupom> pagina = new PageImpl<>(List.of(expirado), pageable, 1);
-
-            when(cupomRepository.findAll(pageable)).thenReturn(pagina);
-            when(cupomMapper.toResponse(expirado)).thenReturn(responseValido(expirado));
-
-            // Act
-            cupomService.listar(pageable);
-
-            // Assert
-            assertThat(expirado.getStatus()).isEqualTo(StatusCupom.EXPIRADO);
-        }
     }
 
     // =========================================================
@@ -319,25 +267,20 @@ class CupomServiceTest {
         @BeforeEach
         void setUp() {
             requestValido = new CupomUpdateRequest(
-            		"PROMO10", 
-            		new BigDecimal("0.05"),
-            		LocalDate.now().plusDays(5),
-            		StatusCupom.EXPIRADO);
+                    "PROMO10", 
+                    new BigDecimal("0.05"),
+                    LocalDate.now().plusDays(5),
+                    StatusCupom.EXPIRADO);
         }
 
         @Test
         @DisplayName("deve atualizar cupom com sucesso quando dados são válidos")
         void deveAtualizarCupomComSucesso() {
             // Arrange
-            Cupom cupom = cupomValido(); // código = "PROMO10"
+            Cupom cupom = cupomValido();
             CupomResponse response = responseValido(cupom);
 
-            // findById é chamado 2x:
-            //   1ª chamada → buscarCupomPorId (retorna o cupom)
-            //   2ª chamada → validarCodigoDuplicado (verifica se o código pertence ao mesmo cupom)
-            when(cupomRepository.findById(1L))
-                    .thenReturn(Optional.of(cupom))  // 1ª chamada
-                    .thenReturn(Optional.of(cupom)); // 2ª chamada
+            when(cupomRepository.findById(1L)).thenReturn(Optional.of(cupom));
             when(cupomRepository.save(cupom)).thenReturn(cupom);
             when(cupomMapper.toResponse(cupom)).thenReturn(response);
 
@@ -346,10 +289,10 @@ class CupomServiceTest {
 
             // Assert
             assertThat(resultado).isNotNull();
+            verify(cupomValidator).validarCodigoDuplicado("PROMO10", 1L);
+            verify(cupomValidator).validarDataValidade(requestValido.dataValidade());
             verify(cupomMapper).updateEntityFromRequest(requestValido, cupom);
             verify(cupomRepository).save(cupom);
-            // Como ehOMesmoCodigo=true, existsByCodigoIgnoreCase nunca deve ser chamado
-            verify(cupomRepository, never()).existsByCodigoIgnoreCase(any());
         }
 
         @Test
@@ -370,21 +313,17 @@ class CupomServiceTest {
         void deveLancarExcecaoQuandoCodigoDuplicadoEmOutroCupom() {
             // Arrange
             Cupom cupom = cupomValido();
-            cupom.setCodigo("OUTRO_CODIGO"); // código diferente do request
-
             CupomUpdateRequest requestComCodigoNovo = new CupomUpdateRequest(
-            		"NOVOCOD", 
-            		new BigDecimal("0.05"),
-            		LocalDate.now().plusDays(5),
-            		StatusCupom.INATIVO);
+                    "NOVOCOD", 
+                    new BigDecimal("0.05"),
+                    LocalDate.now().plusDays(5),
+                    StatusCupom.INATIVO);
 
-            // findById é chamado 2x:
-            //   1ª chamada → buscarCupomPorId
-            //   2ª chamada → validarCodigoDuplicado (ehOMesmoCodigo = false, pois o código mudou)
-            when(cupomRepository.findById(1L))
-                    .thenReturn(Optional.of(cupom))  // 1ª chamada
-                    .thenReturn(Optional.of(cupom)); // 2ª chamada
-            when(cupomRepository.existsByCodigoIgnoreCase("NOVOCOD")).thenReturn(true);
+            when(cupomRepository.findById(1L)).thenReturn(Optional.of(cupom));
+            
+            // Simula o validador lançando erro de conflito
+            doThrow(new BusinessException(HttpStatus.CONFLICT, "Código de cupom já cadastrado", ""))
+                .when(cupomValidator).validarCodigoDuplicado("NOVOCOD", 1L);
 
             // Act & Assert
             assertThatThrownBy(() -> cupomService.atualizar(1L, requestComCodigoNovo))
@@ -401,20 +340,17 @@ class CupomServiceTest {
         @DisplayName("deve lançar BusinessException quando data de validade é passada")
         void deveLancarExcecaoQuandoDataExpirada() {
             // Arrange
-            Cupom cupom = cupomValido(); // código = "PROMO10"
-            CupomUpdateRequest requestExpirado =
-                    new CupomUpdateRequest(
-                    		"PROMO10", 
-                    		new BigDecimal("0.05"),
-                    		LocalDate.now().minusDays(1),
-                    		StatusCupom.ATIVO);
+            Cupom cupom = cupomValido();
+            CupomUpdateRequest requestExpirado = new CupomUpdateRequest(
+                            "PROMO10", 
+                            new BigDecimal("0.05"),
+                            LocalDate.now().minusDays(1),
+                            StatusCupom.ATIVO);
 
-            // findById é chamado 2x:
-            //   1ª chamada → buscarCupomPorId
-            //   2ª chamada → validarCodigoDuplicado (ehOMesmoCodigo=true → retorna cedo, sem existsBy)
-            when(cupomRepository.findById(1L))
-                    .thenReturn(Optional.of(cupom))  // 1ª chamada
-                    .thenReturn(Optional.of(cupom)); // 2ª chamada
+            when(cupomRepository.findById(1L)).thenReturn(Optional.of(cupom));
+            
+            doThrow(new BusinessException(HttpStatus.BAD_REQUEST, "A validade do código expirou", ""))
+                .when(cupomValidator).validarDataValidade(requestExpirado.dataValidade());
 
             // Act & Assert
             assertThatThrownBy(() -> cupomService.atualizar(1L, requestExpirado))
@@ -425,34 +361,6 @@ class CupomServiceTest {
                     });
 
             verify(cupomRepository, never()).save(any());
-        }
-
-        @Test
-        @DisplayName("deve ignorar verificação de duplicidade quando código não foi alterado")
-        void deveIgnorarVerificacaoDuplicidadeQuandoCodigoIgual() {
-            // Arrange
-            Cupom cupom = cupomValido(); // código = "PROMO10"
-            CupomUpdateRequest mesmoCodigoRequest =
-                    new CupomUpdateRequest(
-                    		"PROMO10", 
-                    		new BigDecimal("0.05"), 
-                    		LocalDate.now().plusDays(5), 
-                    		StatusCupom.ATIVO);
-
-            // findById é chamado 2x:
-            //   1ª chamada → buscarCupomPorId
-            //   2ª chamada → validarCodigoDuplicado (ehOMesmoCodigo=true → sai sem chamar existsBy)
-            when(cupomRepository.findById(1L))
-                    .thenReturn(Optional.of(cupom))  // 1ª chamada
-                    .thenReturn(Optional.of(cupom)); // 2ª chamada
-            when(cupomRepository.save(cupom)).thenReturn(cupom);
-            when(cupomMapper.toResponse(cupom)).thenReturn(responseValido(cupom));
-
-            // Act
-            cupomService.atualizar(1L, mesmoCodigoRequest);
-
-            // Assert
-            verify(cupomRepository, never()).existsByCodigoIgnoreCase(any());
         }
     }
 

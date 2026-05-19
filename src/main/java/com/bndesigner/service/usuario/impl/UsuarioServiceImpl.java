@@ -2,7 +2,6 @@ package com.bndesigner.service.usuario.impl;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,12 +9,11 @@ import com.bndesigner.domain.entity.usuario.Usuario;
 import com.bndesigner.dto.request.usuario.UsuarioCreateRequest;
 import com.bndesigner.dto.request.usuario.UsuarioUpdateRequest;
 import com.bndesigner.dto.response.usuario.UsuarioResponse;
-import com.bndesigner.exceptions.BusinessException;
-import com.bndesigner.exceptions.ResourceNotFoundException;
-
 import com.bndesigner.mapper.usuario.UsuarioMapper;
 import com.bndesigner.repository.usuario.UsuarioRepository;
 import com.bndesigner.service.usuario.UsuarioService;
+import com.bndesigner.service.validation.UsuarioValidator;
+import com.bndesigner.util.EntityLookup;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,12 +23,13 @@ public class UsuarioServiceImpl implements UsuarioService{
 	
 	private final UsuarioRepository usuarioRepository;
 	private final UsuarioMapper usuarioMapper;
+	private final UsuarioValidator usuarioValidator;
 
 	@Override
 	@Transactional
 	public UsuarioResponse criar(UsuarioCreateRequest request) {
 		
-		validarEmail(null, request.email());
+		usuarioValidator.validarEmail(null, request.email());
 		
 		Usuario usuario = usuarioMapper.toEntity(request);
 		Usuario salvo = usuarioRepository.save(usuario);
@@ -42,7 +41,7 @@ public class UsuarioServiceImpl implements UsuarioService{
 	@Transactional(readOnly = true)
 	public UsuarioResponse buscarPorId(Long id) {
 		
-		Usuario usuario = buscarUsuarioPorId(id);		
+		Usuario usuario = EntityLookup.buscarOuLancar(usuarioRepository, id, "Usuário");		
 		return usuarioMapper.toResponse(usuario);
 
 	}
@@ -59,9 +58,9 @@ public class UsuarioServiceImpl implements UsuarioService{
 	@Transactional
 	public UsuarioResponse atualizar(Long id, UsuarioUpdateRequest usuarioAtualizado) {
 		
-		Usuario usuario = buscarUsuarioPorId(id);
+		Usuario usuario = EntityLookup.buscarOuLancar(usuarioRepository, id, "Usuário");
 		
-		validarEmail(id, usuarioAtualizado.email());
+		usuarioValidator.validarEmail(id, usuarioAtualizado.email());
 		
 		usuarioMapper.updateEntityFromRequest(usuarioAtualizado, usuario);
 		
@@ -74,37 +73,9 @@ public class UsuarioServiceImpl implements UsuarioService{
 	@Transactional
 	public void deletar(Long id) {
 		
-		Usuario usuario = buscarUsuarioPorId(id);
+		Usuario usuario = EntityLookup.buscarOuLancar(usuarioRepository, id, "Usuário");
 		
 		usuarioRepository.delete(usuario);
 		
-	}
-	
-	
-	private Usuario buscarUsuarioPorId(Long id) {
-		return usuarioRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Usuario", id));
-	}
-	
-private void validarEmail(Long id, String email) {
-		
-		boolean emailEmUso = usuarioRepository.existsByEmail(email);
-		
-		if (emailEmUso) {
-			boolean ehOMesmoEmail = id != null
-					&& usuarioRepository.findByEmail(email)
-					.map(u -> u.getIdUsuario().equals(id))
-					.orElse(false);
-			
-			if (!ehOMesmoEmail) {
-				throw new BusinessException(HttpStatus.CONFLICT,
-			        "Email já cadastrado",
-			        "O email " + email + " já está em uso"
-			    );
-			}
-			
-		}
-		
-	}
-
+	}	
 }

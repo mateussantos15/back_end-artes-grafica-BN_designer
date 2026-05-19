@@ -15,7 +15,7 @@ import com.bndesigner.exceptions.ResourceNotFoundException;
 import com.bndesigner.mapper.arquivo.ArquivoMapper;
 import com.bndesigner.repository.arquivo.ArquivoRepository;
 import com.bndesigner.service.arquivo.ArquivoService;
-
+import com.bndesigner.util.EntityLookup;
 
 import lombok.AllArgsConstructor;
 
@@ -49,7 +49,8 @@ public class ArquivoServiceImpl implements ArquivoService {
 	@Transactional(readOnly = true)
 	public ArquivoResponse buscarPorId(Long id) {
 		
-		Arquivo entity = buscarEntidadePorId(id);
+		Arquivo entity = EntityLookup.buscarOuLancar(
+				arquivoRepository, id, "Arquivo");
 		
 		return arquivoMapper.toResponse(entity);
 	}
@@ -65,7 +66,8 @@ public class ArquivoServiceImpl implements ArquivoService {
 	@Override
 	public ArquivoResponse atualizar(Long id, ArquivoUpdateRequest updateRequest) {
 		
-		Arquivo entity = buscarEntidadePorId(id);
+		Arquivo entity = EntityLookup.buscarOuLancar(
+				arquivoRepository, id, "Arquivo");
 		
 		arquivoMapper.updateEntityFromRequest(updateRequest, entity);		
 		
@@ -75,17 +77,12 @@ public class ArquivoServiceImpl implements ArquivoService {
 	@Override
 	public void desativar(Long id) {
 		
-		Arquivo entity = buscarEntidadePorId(id);
+		Arquivo entity = EntityLookup.buscarOuLancar(
+				arquivoRepository, id, "Arquivo");
 		
 		entity.setAtivo(false);
 		
 		arquivoRepository.save(entity);
 		
 	}
-	
-	private Arquivo buscarEntidadePorId(Long id) {
-		return arquivoRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Arquivo", id));
-	}
-
 }

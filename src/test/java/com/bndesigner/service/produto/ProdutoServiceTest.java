@@ -34,10 +34,10 @@ import com.bndesigner.dto.response.produto.ProdutoResponse;
 import com.bndesigner.exceptions.BusinessException;
 import com.bndesigner.exceptions.ResourceNotFoundException;
 import com.bndesigner.mapper.produto.ProdutoMapper;
-import com.bndesigner.repository.arquivo.ArquivoRepository;
 import com.bndesigner.repository.categoria.CategoriaRepository;
 import com.bndesigner.repository.produto.ProdutoRepository;
 import com.bndesigner.service.produto.impl.ProdutoServiceImpl;
+import com.bndesigner.service.validation.ArquivoValidator;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProdutoServiceImpl")
@@ -54,7 +54,7 @@ class ProdutoServiceImplTest {
     private CategoriaRepository categoriaRepository;
 
     @Mock
-    private ArquivoRepository arquivoRepository;
+    private ArquivoValidator arquivoValidator; // Trocado ArquivoRepository por ArquivoValidator
 
     @Mock
     private ProdutoMapper mapper;
@@ -77,13 +77,6 @@ class ProdutoServiceImplTest {
         Arquivo a = new Arquivo();
         a.setIdArquivo(10L);
         a.setAtivo(true);
-        return a;
-    }
-
-    private Arquivo arquivoInativoFake() {
-        Arquivo a = new Arquivo();
-        a.setIdArquivo(99L);
-        a.setAtivo(false);
         return a;
     }
 
@@ -150,7 +143,7 @@ class ProdutoServiceImplTest {
             ProdutoResponse response = responseFake();
 
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-            when(arquivoRepository.findById(10L)).thenReturn(Optional.of(arquivo));
+            when(arquivoValidator.resolverArquivo(10L)).thenReturn(arquivo); // Mockando o validador
             when(mapper.toEntity(request)).thenReturn(produto);
             when(repository.save(produto)).thenReturn(produto);
             when(mapper.toResponse(produto)).thenReturn(response);
@@ -178,6 +171,7 @@ class ProdutoServiceImplTest {
                     LocalDateTime.of(2026, 10, 3, 10, 0), 1L, "Design", null);
 
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
+            when(arquivoValidator.resolverArquivo(null)).thenReturn(null); // Mockando o validador para null
             when(mapper.toEntity(request)).thenReturn(produto);
             when(repository.save(produto)).thenReturn(produto);
             when(mapper.toResponse(produto)).thenReturn(response);
@@ -188,7 +182,6 @@ class ProdutoServiceImplTest {
             // Assert
             assertThat(resultado).isNotNull();
             assertThat(resultado.arquivoId()).isNull();
-            verify(arquivoRepository, never()).findById(any());
         }
 
         @Test
@@ -208,49 +201,28 @@ class ProdutoServiceImplTest {
         }
 
         @Test
-        @DisplayName("deve lançar ResourceNotFoundException quando arquivo não existe")
-        void deveLancarExcecaoQuandoArquivoNaoExiste() {
+        @DisplayName("deve repassar a exceção do validador quando arquivo não existe ou está inativo")
+        void deveRepassarExcecaoDoValidador() {
             // Arrange
             ProdutoCreateRequest request = createRequestComArquivo();
             Categoria categoria = categoriaFake();
-            Produto produto = produtoFake();
+            Produto produto = produtoFake(); // Criamos a instância do produto fake
 
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
+            
+            // Garantimos que o mapper não retorne null, permitindo que a execução 
+            // prossiga até a linha do validador
             when(mapper.toEntity(request)).thenReturn(produto);
-            when(arquivoRepository.findById(10L)).thenReturn(Optional.empty());
+            
+            // Configuramos o validador para lançar a exceção esperada
+            when(arquivoValidator.resolverArquivo(10L))
+                    .thenThrow(new ResourceNotFoundException("Arquivo", 10L));
 
             // Act & Assert
             assertThatThrownBy(() -> service.criar(request))
                     .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessageContaining("Arquivo")
                     .hasMessageContaining("10");
-
-            verify(repository, never()).save(any());
-        }
-
-        @Test
-        @DisplayName("deve lançar BusinessException quando arquivo está inativo")
-        void deveLancarExcecaoQuandoArquivoInativo() {
-            // Arrange
-            ProdutoCreateRequest request = new ProdutoCreateRequest(
-                    "Logo", "Desc", new BigDecimal("10.00"), 1L, 99L);
-            Categoria categoria = categoriaFake();
-            Arquivo inativo = arquivoInativoFake();
-            Produto produto = produtoFake();
-
-            when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-            when(mapper.toEntity(request)).thenReturn(produto);
-            when(arquivoRepository.findById(99L)).thenReturn(Optional.of(inativo));
-
-            // Act & Assert
-            assertThatThrownBy(() -> service.criar(request))
-                    .isInstanceOf(BusinessException.class)
-                    .satisfies(ex -> {
-                        BusinessException be = (BusinessException) ex;
-                        assertThat(be.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
-                        assertThat(be.getMessage()).contains("99");
-                        assertThat(be.getMessage()).contains("inativo");
-                    });
 
             verify(repository, never()).save(any());
         }
@@ -413,7 +385,7 @@ class ProdutoServiceImplTest {
 
             when(repository.findById(100L)).thenReturn(Optional.of(produto));
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-            when(arquivoRepository.findById(10L)).thenReturn(Optional.of(arquivo));
+            when(arquivoValidator.resolverArquivo(10L)).thenReturn(arquivo); // Mockando o validador
             when(repository.save(produto)).thenReturn(produto);
             when(mapper.toResponse(produto)).thenReturn(response);
 
@@ -441,6 +413,7 @@ class ProdutoServiceImplTest {
 
             when(repository.findById(100L)).thenReturn(Optional.of(produto));
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
+            when(arquivoValidator.resolverArquivo(null)).thenReturn(null); // Mockando o validador para null
             when(repository.save(produto)).thenReturn(produto);
             when(mapper.toResponse(produto)).thenReturn(response);
 
@@ -449,7 +422,6 @@ class ProdutoServiceImplTest {
 
             // Assert
             assertThat(resultado.arquivoId()).isNull();
-            verify(arquivoRepository, never()).findById(any());
         }
 
         @Test
@@ -488,8 +460,8 @@ class ProdutoServiceImplTest {
         }
 
         @Test
-        @DisplayName("deve lançar ResourceNotFoundException quando arquivo não existe")
-        void deveLancarExcecaoQuandoArquivoNaoExiste() {
+        @DisplayName("deve repassar exceção do validador no cenário de erro na atualização")
+        void deveRepassarExcecaoDoValidadorNaAtualizacao() {
             // Arrange
             ProdutoUpdateRequest request = updateRequestComArquivo();
             Produto produto = produtoFake();
@@ -497,40 +469,13 @@ class ProdutoServiceImplTest {
 
             when(repository.findById(100L)).thenReturn(Optional.of(produto));
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-            when(arquivoRepository.findById(10L)).thenReturn(Optional.empty());
-
-            // Act & Assert
-            assertThatThrownBy(() -> service.atualizar(100L, request))
-                    .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessageContaining("Arquivo")
-                    .hasMessageContaining("10");
-
-            verify(repository, never()).save(any());
-        }
-
-        @Test
-        @DisplayName("deve lançar BusinessException quando arquivo está inativo")
-        void deveLancarExcecaoQuandoArquivoInativo() {
-            // Arrange
-            ProdutoUpdateRequest request = new ProdutoUpdateRequest(
-                    "Logo", "Desc", new BigDecimal("10.00"), 1L, 99L);
-            Produto produto = produtoFake();
-            Categoria categoria = categoriaFake();
-            Arquivo inativo = arquivoInativoFake();
-
-            when(repository.findById(100L)).thenReturn(Optional.of(produto));
-            when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-            when(arquivoRepository.findById(99L)).thenReturn(Optional.of(inativo));
+            when(arquivoValidator.resolverArquivo(10L))
+                    .thenThrow(new BusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Erro", "Arquivo inativo"));
 
             // Act & Assert
             assertThatThrownBy(() -> service.atualizar(100L, request))
                     .isInstanceOf(BusinessException.class)
-                    .satisfies(ex -> {
-                        BusinessException be = (BusinessException) ex;
-                        assertThat(be.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
-                        assertThat(be.getMessage()).contains("99");
-                        assertThat(be.getMessage()).contains("inativo");
-                    });
+                    .hasMessageContaining("Arquivo inativo");
 
             verify(repository, never()).save(any());
         }
