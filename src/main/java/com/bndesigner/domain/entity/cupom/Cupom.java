@@ -41,5 +41,18 @@ public class Cupom {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private StatusCupom status;
-
+	
+	
+	public void atualizarStatus(Cupom cupom) {
+		
+		if(cupom.getDataValidade().isBefore(LocalDate.now())) {
+			
+			cupom.setStatus(StatusCupom.EXPIRADO);
+			
+		} else if (cupom.getStatus() == null) {
+			
+			cupom.setStatus(StatusCupom.ATIVO);
+			
+		}		
+	}
 }
