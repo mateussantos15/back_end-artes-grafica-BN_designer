@@ -1,4 +1,4 @@
-package com.bndesigner.dto.request.copum;
+package com.bndesigner.dto.request.cupom;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
