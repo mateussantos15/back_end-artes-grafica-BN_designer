@@ -2,8 +2,8 @@ package com.bndesigner.service.cupom;
 
 import com.bndesigner.domain.entity.cupom.Cupom;
 import com.bndesigner.domain.enums.cupom.StatusCupom;
-import com.bndesigner.dto.request.copum.CupomCreateRequest;
-import com.bndesigner.dto.request.copum.CupomUpdateRequest;
+import com.bndesigner.dto.request.cupom.CupomCreateRequest;
+import com.bndesigner.dto.request.cupom.CupomUpdateRequest;
 import com.bndesigner.dto.response.cupom.CupomResponse;
 import com.bndesigner.exceptions.BusinessException;
 import com.bndesigner.exceptions.ResourceNotFoundException;
@@ -262,7 +262,7 @@ class CupomServiceTest {
             when(cupomMapper.toResponse(c2)).thenReturn(responseValido(c2));
 
             // Act
-            Page<CupomResponse> resultado = cupomService.listar(null, pageable);
+            Page<CupomResponse> resultado = cupomService.listar(pageable);
 
             // Assert
             assertThat(resultado.getTotalElements()).isEqualTo(2);
@@ -278,7 +278,7 @@ class CupomServiceTest {
             when(cupomRepository.findAll(pageable)).thenReturn(Page.empty(pageable));
 
             // Act
-            Page<CupomResponse> resultado = cupomService.listar(null, pageable);
+            Page<CupomResponse> resultado = cupomService.listar(pageable);
 
             // Assert
             assertThat(resultado.getTotalElements()).isZero();
@@ -300,7 +300,7 @@ class CupomServiceTest {
             when(cupomMapper.toResponse(expirado)).thenReturn(responseValido(expirado));
 
             // Act
-            cupomService.listar(null, pageable);
+            cupomService.listar(pageable);
 
             // Assert
             assertThat(expirado.getStatus()).isEqualTo(StatusCupom.EXPIRADO);

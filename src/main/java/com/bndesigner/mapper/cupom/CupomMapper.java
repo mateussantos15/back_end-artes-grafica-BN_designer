@@ -6,8 +6,8 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import com.bndesigner.domain.entity.cupom.Cupom;
-import com.bndesigner.dto.request.copum.CupomCreateRequest;
-import com.bndesigner.dto.request.copum.CupomUpdateRequest;
+import com.bndesigner.dto.request.cupom.CupomCreateRequest;
+import com.bndesigner.dto.request.cupom.CupomUpdateRequest;
 import com.bndesigner.dto.response.cupom.CupomResponse;
 
 @Mapper(componentModel = "spring")

@@ -1,6 +1,7 @@
 package com.bndesigner.service.cupom.impl;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,9 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bndesigner.domain.entity.cupom.Cupom;
 import com.bndesigner.domain.enums.cupom.StatusCupom;
-import com.bndesigner.dto.request.copum.CupomCreateRequest;
-import com.bndesigner.dto.request.copum.CupomUpdateRequest;
+import com.bndesigner.dto.request.cupom.CupomCreateRequest;
+import com.bndesigner.dto.request.cupom.CupomUpdateRequest;
 import com.bndesigner.dto.response.cupom.CupomResponse;
+import com.bndesigner.dto.response.cupom.ValidacaoCupomResponse;
 import com.bndesigner.exceptions.BusinessException;
 import com.bndesigner.exceptions.ResourceNotFoundException;
 import com.bndesigner.mapper.cupom.CupomMapper;
@@ -57,7 +59,7 @@ public class CupomServiceImpl implements CupomService {
 
 	@Override
 	@Transactional
-	public Page<CupomResponse> listar(Long id, Pageable pageable) {
+	public Page<CupomResponse> listar(Pageable pageable) {
 		
 		Page<Cupom> cuponsPage = cupomRepository.findAll(pageable);
 		
@@ -92,6 +94,45 @@ public class CupomServiceImpl implements CupomService {
 		
 		cupomRepository.delete(cupom);
 		
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public ValidacaoCupomResponse validarCupom(String codigo) {
+
+	    Optional<Cupom> optionalCupom =
+	            cupomRepository.findByCodigoIgnoreCase(codigo);
+
+	    if (optionalCupom.isEmpty()) {
+
+	        return new ValidacaoCupomResponse(
+	                false,
+	                codigo,
+	                null,
+	                "Cupom não encontrado"
+	        );
+	    }
+
+	    Cupom cupom = optionalCupom.get();
+
+	    atualizarStatusAutomaticamente(cupom);
+
+	    if (cupom.getStatus() != StatusCupom.ATIVO) {
+
+	        return new ValidacaoCupomResponse(
+	                false,
+	                codigo,
+	                null,
+	                "Cupom inválido ou expirado"
+	        );
+	    }
+
+	    return new ValidacaoCupomResponse(
+	            true,
+	            cupom.getCodigo(),
+	            cupom.getDescontoPercentual(),
+	            "Cupom válido"
+	    );
 	}
 	
 	
