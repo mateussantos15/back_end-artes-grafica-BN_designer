@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bndesigner.domain.entity.cupom.Cupom;
 import com.bndesigner.domain.enums.cupom.StatusCupom;
+import com.bndesigner.domain.validation.CupomValidator;
 import com.bndesigner.dto.request.cupom.CupomCreateRequest;
 import com.bndesigner.dto.request.cupom.CupomUpdateRequest;
 import com.bndesigner.dto.response.cupom.CupomResponse;
@@ -16,7 +17,6 @@ import com.bndesigner.dto.response.cupom.ValidacaoCupomResponse;
 import com.bndesigner.mapper.cupom.CupomMapper;
 import com.bndesigner.repository.cupom.CupomRepository;
 import com.bndesigner.service.cupom.CupomService;
-import com.bndesigner.service.validation.CupomValidator;
 import com.bndesigner.util.EntityLookup;
 
 import lombok.AllArgsConstructor;

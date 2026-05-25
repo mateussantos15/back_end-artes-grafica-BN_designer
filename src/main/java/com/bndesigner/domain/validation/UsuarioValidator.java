@@ -1,9 +1,8 @@
-package com.bndesigner.service.validation;
+package com.bndesigner.domain.validation;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import com.bndesigner.exceptions.BusinessException;
+import com.bndesigner.exceptions.custom.DuplicateResourceException;
 import com.bndesigner.repository.usuario.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -25,11 +24,8 @@ public class UsuarioValidator {
 					.orElse(false);
 			
 			if (!ehOMesmoEmail) {
-				throw new BusinessException(HttpStatus.CONFLICT,
-			        "Email já cadastrado",
-			        "O email " + email + " já está em uso"
-			    );
-			}			
-		}		
+				throw new DuplicateResourceException("Usuário", "Email", email);
+			}
+		}
 	}
 }

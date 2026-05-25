@@ -24,15 +24,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
 import com.bndesigner.domain.entity.usuario.Usuario;
+import com.bndesigner.domain.validation.UsuarioValidator;
 import com.bndesigner.dto.request.usuario.UsuarioCreateRequest;
 import com.bndesigner.dto.request.usuario.UsuarioUpdateRequest;
 import com.bndesigner.dto.response.usuario.UsuarioResponse;
-import com.bndesigner.exceptions.BusinessException;
-import com.bndesigner.exceptions.ResourceNotFoundException;
+import com.bndesigner.exceptions.custom.BusinessException;
+import com.bndesigner.exceptions.custom.ResourceNotFoundException;
 import com.bndesigner.mapper.usuario.UsuarioMapper;
 import com.bndesigner.repository.usuario.UsuarioRepository;
 import com.bndesigner.service.usuario.impl.UsuarioServiceImpl;
-import com.bndesigner.service.validation.UsuarioValidator;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UsuarioServiceImpl")

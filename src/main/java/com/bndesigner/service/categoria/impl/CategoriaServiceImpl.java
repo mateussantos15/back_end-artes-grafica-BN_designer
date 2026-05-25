@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bndesigner.domain.entity.categoria.Categoria;
+import com.bndesigner.domain.validation.CategoriaValidator;
 import com.bndesigner.dto.request.categoria.CategoriaCreateRequest;
 import com.bndesigner.dto.request.categoria.CategoriaUpdateRequest;
 import com.bndesigner.dto.response.categoria.CategoriaResponse;
 import com.bndesigner.mapper.categoria.CategoriaMapper;
 import com.bndesigner.repository.categoria.CategoriaRepository;
 import com.bndesigner.service.categoria.CategoriaService;
-import com.bndesigner.service.validation.CategoriaValidator;
 import com.bndesigner.util.EntityLookup;
 
 import lombok.AllArgsConstructor;

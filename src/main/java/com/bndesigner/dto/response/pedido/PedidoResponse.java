@@ -2,8 +2,10 @@ package com.bndesigner.dto.response.pedido;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.bndesigner.domain.enums.pedido.StatusPedido;
+import com.bndesigner.dto.response.itemPedido.ItemPedidoResponse;
 
 public record PedidoResponse(
 		
@@ -16,6 +18,8 @@ public record PedidoResponse(
 		Long cupomId,
 		
 		String emailCliente,
-		String cpf
+		String cpf,
+		
+		List<ItemPedidoResponse> itens
 		
 		) {}

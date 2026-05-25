@@ -2,7 +2,7 @@ package com.bndesigner.util;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.bndesigner.exceptions.ResourceNotFoundException;
+import com.bndesigner.exceptions.custom.ResourceNotFoundException;
 
 /**
  * Utilitário genérico para busca de entidades por ID em repositórios JPA.

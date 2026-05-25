@@ -28,8 +28,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.bndesigner.exceptions.ResourceNotFoundException;
 import com.bndesigner.dto.response.produto.ProdutoResponse;
+import com.bndesigner.exceptions.custom.ResourceNotFoundException;
 import com.bndesigner.service.produto.ProdutoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

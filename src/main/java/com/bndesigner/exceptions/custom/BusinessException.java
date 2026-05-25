@@ -1,8 +1,9 @@
-package com.bndesigner.exceptions;
+package com.bndesigner.exceptions.custom;
 
 import org.springframework.http.HttpStatus;
 
 public class BusinessException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 	private final HttpStatus status;
 	private final String title;
 	
