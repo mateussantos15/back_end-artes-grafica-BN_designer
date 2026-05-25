@@ -26,15 +26,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
 import com.bndesigner.domain.entity.categoria.Categoria;
+import com.bndesigner.domain.validation.CategoriaValidator;
 import com.bndesigner.dto.request.categoria.CategoriaCreateRequest;
 import com.bndesigner.dto.request.categoria.CategoriaUpdateRequest;
 import com.bndesigner.dto.response.categoria.CategoriaResponse;
-import com.bndesigner.exceptions.BusinessException;
-import com.bndesigner.exceptions.ResourceNotFoundException;
+import com.bndesigner.exceptions.custom.BusinessException;
+import com.bndesigner.exceptions.custom.ResourceNotFoundException;
 import com.bndesigner.mapper.categoria.CategoriaMapper;
 import com.bndesigner.repository.categoria.CategoriaRepository;
 import com.bndesigner.service.categoria.impl.CategoriaServiceImpl;
-import com.bndesigner.service.validation.CategoriaValidator;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("CategoriaServiceImpl")
@@ -146,7 +146,7 @@ public class CategoriaServiceTest {
 
             assertThatThrownBy(() -> categoriaServiceImpl.buscarPorId(99L))
                     .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage(String.format("%s com identificador '%s' não foi encontrado.", "Categoria", 99L));
+                    .hasMessage(String.format("'%s' com identificador '%s' não foi encontrado.", "Categoria", 99L));
 
             verify(categoriaMapper, never()).toResponse(any());
         }
@@ -253,7 +253,7 @@ public class CategoriaServiceTest {
 
             assertThatThrownBy(() -> categoriaServiceImpl.atualizar(99L, request))
                     .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage(String.format("%s com identificador '%s' não foi encontrado.", "Categoria", 99L));
+                    .hasMessage(String.format("'%s' com identificador '%s' não foi encontrado.", "Categoria", 99L));
 
             // Garante que o validador e o save foram completamente ignorados
             verify(categoriaValidator, never()).validarNomeCategoria(any(), any());
@@ -285,7 +285,7 @@ public class CategoriaServiceTest {
 
             assertThatThrownBy(() -> categoriaServiceImpl.deletar(99L))
                     .isInstanceOf(ResourceNotFoundException.class)
-                    .hasMessage(String.format("%s com identificador '%s' não foi encontrado.", "Categoria", 99L));
+                    .hasMessage(String.format("'%s' com identificador '%s' não foi encontrado.", "Categoria", 99L));
 
             verify(categoriaRepository, never()).delete(any());
         }

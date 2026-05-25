@@ -3,7 +3,7 @@ package com.bndesigner.controller.categoria;
 import com.bndesigner.dto.request.categoria.CategoriaCreateRequest;
 import com.bndesigner.dto.request.categoria.CategoriaUpdateRequest;
 import com.bndesigner.dto.response.categoria.CategoriaResponse;
-import com.bndesigner.exceptions.ResourceNotFoundException;
+import com.bndesigner.exceptions.custom.ResourceNotFoundException;
 import com.bndesigner.service.categoria.CategoriaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;

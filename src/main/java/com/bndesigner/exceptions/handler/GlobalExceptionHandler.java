@@ -1,12 +1,14 @@
 package com.bndesigner.exceptions.handler;
 
-import com.bndesigner.exceptions.BusinessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.bndesigner.exceptions.custom.BusinessException;
+
 import java.time.OffsetDateTime;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -30,8 +32,7 @@ public class GlobalExceptionHandler {
                 .getFieldErrors()
                 .stream()
                 .map(e -> e.getField() + ": " + e.getDefaultMessage())
-                .toList()
-                .toString();
+                .collect(Collectors.joining(", "));
 
         return ResponseEntity.badRequest()
                 .body(new ApiError(

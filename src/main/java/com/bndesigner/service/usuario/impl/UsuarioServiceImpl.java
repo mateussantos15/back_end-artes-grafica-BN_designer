@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bndesigner.domain.entity.usuario.Usuario;
+import com.bndesigner.domain.validation.UsuarioValidator;
 import com.bndesigner.dto.request.usuario.UsuarioCreateRequest;
 import com.bndesigner.dto.request.usuario.UsuarioUpdateRequest;
 import com.bndesigner.dto.response.usuario.UsuarioResponse;
 import com.bndesigner.mapper.usuario.UsuarioMapper;
 import com.bndesigner.repository.usuario.UsuarioRepository;
 import com.bndesigner.service.usuario.UsuarioService;
-import com.bndesigner.service.validation.UsuarioValidator;
 import com.bndesigner.util.EntityLookup;
 
 import lombok.RequiredArgsConstructor;

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.bndesigner.domain.entity.categoria.Categoria;
 import com.bndesigner.domain.entity.produto.Produto;
+import com.bndesigner.domain.resolver.ArquivoResolver;
 import com.bndesigner.dto.request.produto.ProdutoCreateRequest;
 import com.bndesigner.dto.request.produto.ProdutoUpdateRequest;
 import com.bndesigner.dto.response.produto.ProdutoResponse;
@@ -15,7 +16,6 @@ import com.bndesigner.mapper.produto.ProdutoMapper;
 import com.bndesigner.repository.categoria.CategoriaRepository;
 import com.bndesigner.repository.produto.ProdutoRepository;
 import com.bndesigner.service.produto.ProdutoService;
-import com.bndesigner.service.validation.ArquivoValidator;
 import com.bndesigner.util.EntityLookup;
 
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 	private final ProdutoRepository produtoRepository;
     private final CategoriaRepository categoriaRepository;
     private final ProdutoMapper produtoMapper;
-    private final ArquivoValidator arquivoValidator;
+    private final ArquivoResolver arquivoValidator;
 
 	@Override
 	public ProdutoResponse criar(ProdutoCreateRequest createRequest) {
@@ -36,7 +36,7 @@ public class ProdutoServiceImpl implements ProdutoService {
 		
 		Produto produto = produtoMapper.toEntity(createRequest);
 		produto.setCategoria(categoria);
-		produto.setArquivo(arquivoValidator.resolverArquivo(createRequest.arquivoId()));
+		produto.setArquivo(arquivoValidator.buscarArquivoAtivo(createRequest.arquivoId()));
 		
 		return produtoMapper.toResponse(produtoRepository.save(produto));
 	}
@@ -82,7 +82,7 @@ public class ProdutoServiceImpl implements ProdutoService {
         produto.setCategoria(categoria);
  
         // arquivoId nulo no request remove explicitamente o arquivo do produto
-        produto.setArquivo(arquivoValidator.resolverArquivo(updateRequest.arquivoId()));
+        produto.setArquivo(arquivoValidator.buscarArquivoAtivo(updateRequest.arquivoId()));
  
         return produtoMapper.toResponse(produtoRepository.save(produto));
 

@@ -1,9 +1,8 @@
-package com.bndesigner.service.validation;
+package com.bndesigner.domain.validation;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import com.bndesigner.exceptions.BusinessException;
+import com.bndesigner.exceptions.custom.DuplicateResourceException;
 import com.bndesigner.repository.categoria.CategoriaRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -31,11 +30,7 @@ public class CategoriaValidator {
 		
 		if (nomeEmUso) {
 			
-			throw new BusinessException(
-					HttpStatus.CONFLICT,
-					"Conflito de Dados",
-					String.format("Já existe uma Categoria com o nome: '%s'.", nome)
-					);
+			throw new DuplicateResourceException("Categoria", "Nome", nome);
 		}			
 	}
 }

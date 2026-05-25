@@ -28,16 +28,16 @@ import org.springframework.http.HttpStatus;
 import com.bndesigner.domain.entity.arquivo.Arquivo;
 import com.bndesigner.domain.entity.categoria.Categoria;
 import com.bndesigner.domain.entity.produto.Produto;
+import com.bndesigner.domain.resolver.ArquivoResolver;
 import com.bndesigner.dto.request.produto.ProdutoCreateRequest;
 import com.bndesigner.dto.request.produto.ProdutoUpdateRequest;
 import com.bndesigner.dto.response.produto.ProdutoResponse;
-import com.bndesigner.exceptions.BusinessException;
-import com.bndesigner.exceptions.ResourceNotFoundException;
+import com.bndesigner.exceptions.custom.BusinessException;
+import com.bndesigner.exceptions.custom.ResourceNotFoundException;
 import com.bndesigner.mapper.produto.ProdutoMapper;
 import com.bndesigner.repository.categoria.CategoriaRepository;
 import com.bndesigner.repository.produto.ProdutoRepository;
 import com.bndesigner.service.produto.impl.ProdutoServiceImpl;
-import com.bndesigner.service.validation.ArquivoValidator;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProdutoServiceImpl")
@@ -54,7 +54,7 @@ class ProdutoServiceImplTest {
     private CategoriaRepository categoriaRepository;
 
     @Mock
-    private ArquivoValidator arquivoValidator; // Trocado ArquivoRepository por ArquivoValidator
+    private ArquivoResolver arquivoValidator; // Trocado ArquivoRepository por ArquivoValidator
 
     @Mock
     private ProdutoMapper mapper;
@@ -143,7 +143,7 @@ class ProdutoServiceImplTest {
             ProdutoResponse response = responseFake();
 
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-            when(arquivoValidator.resolverArquivo(10L)).thenReturn(arquivo); // Mockando o validador
+            when(arquivoValidator.buscarArquivoAtivo(10L)).thenReturn(arquivo); // Mockando o validador
             when(mapper.toEntity(request)).thenReturn(produto);
             when(repository.save(produto)).thenReturn(produto);
             when(mapper.toResponse(produto)).thenReturn(response);
@@ -171,7 +171,7 @@ class ProdutoServiceImplTest {
                     LocalDateTime.of(2026, 10, 3, 10, 0), 1L, "Design", null);
 
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-            when(arquivoValidator.resolverArquivo(null)).thenReturn(null); // Mockando o validador para null
+            when(arquivoValidator.buscarArquivoAtivo(null)).thenReturn(null); // Mockando o validador para null
             when(mapper.toEntity(request)).thenReturn(produto);
             when(repository.save(produto)).thenReturn(produto);
             when(mapper.toResponse(produto)).thenReturn(response);
@@ -215,7 +215,7 @@ class ProdutoServiceImplTest {
             when(mapper.toEntity(request)).thenReturn(produto);
             
             // Configuramos o validador para lançar a exceção esperada
-            when(arquivoValidator.resolverArquivo(10L))
+            when(arquivoValidator.buscarArquivoAtivo(10L))
                     .thenThrow(new ResourceNotFoundException("Arquivo", 10L));
 
             // Act & Assert
@@ -385,7 +385,7 @@ class ProdutoServiceImplTest {
 
             when(repository.findById(100L)).thenReturn(Optional.of(produto));
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-            when(arquivoValidator.resolverArquivo(10L)).thenReturn(arquivo); // Mockando o validador
+            when(arquivoValidator.buscarArquivoAtivo(10L)).thenReturn(arquivo); // Mockando o validador
             when(repository.save(produto)).thenReturn(produto);
             when(mapper.toResponse(produto)).thenReturn(response);
 
@@ -413,7 +413,7 @@ class ProdutoServiceImplTest {
 
             when(repository.findById(100L)).thenReturn(Optional.of(produto));
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-            when(arquivoValidator.resolverArquivo(null)).thenReturn(null); // Mockando o validador para null
+            when(arquivoValidator.buscarArquivoAtivo(null)).thenReturn(null); // Mockando o validador para null
             when(repository.save(produto)).thenReturn(produto);
             when(mapper.toResponse(produto)).thenReturn(response);
 
@@ -469,7 +469,7 @@ class ProdutoServiceImplTest {
 
             when(repository.findById(100L)).thenReturn(Optional.of(produto));
             when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoria));
-            when(arquivoValidator.resolverArquivo(10L))
+            when(arquivoValidator.buscarArquivoAtivo(10L))
                     .thenThrow(new BusinessException(HttpStatus.UNPROCESSABLE_ENTITY, "Erro", "Arquivo inativo"));
 
             // Act & Assert

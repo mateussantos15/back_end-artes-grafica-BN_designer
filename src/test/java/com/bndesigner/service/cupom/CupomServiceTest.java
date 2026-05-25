@@ -2,15 +2,15 @@ package com.bndesigner.service.cupom;
 
 import com.bndesigner.domain.entity.cupom.Cupom;
 import com.bndesigner.domain.enums.cupom.StatusCupom;
+import com.bndesigner.domain.validation.CupomValidator;
 import com.bndesigner.dto.request.cupom.CupomCreateRequest;
 import com.bndesigner.dto.request.cupom.CupomUpdateRequest;
 import com.bndesigner.dto.response.cupom.CupomResponse;
-import com.bndesigner.exceptions.BusinessException;
-import com.bndesigner.exceptions.ResourceNotFoundException;
+import com.bndesigner.exceptions.custom.BusinessException;
+import com.bndesigner.exceptions.custom.ResourceNotFoundException;
 import com.bndesigner.mapper.cupom.CupomMapper;
 import com.bndesigner.repository.cupom.CupomRepository;
 import com.bndesigner.service.cupom.impl.CupomServiceImpl;
-import com.bndesigner.service.validation.CupomValidator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

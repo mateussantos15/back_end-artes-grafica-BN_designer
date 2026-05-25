@@ -1,17 +1,26 @@
 package com.bndesigner.dto.request.pedido;
 
+import java.util.List;
+
+import com.bndesigner.dto.request.itemPedido.ItemPedidoRequest;
+
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 public record PedidoCreatRequest(
 		
 		Long usuarioId,
 		
-		Long cupomId,
+		Long cupomCodigo,
 		
-		@NotBlank
+		@NotBlank(message = "Email é obrigatório")
+		@Email(message = "Email inválido")
 		String emailCliente,
 		
-		@NotBlank
-		String cpf
+		String cpf,
+		
+		@NotEmpty(message = "Pedido deve possuir itens")
+		List<ItemPedidoRequest> itens
 		
 		) {}
