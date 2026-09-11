@@ -1,5 +1,6 @@
 package com.bndesigner.exceptions.handler;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -36,10 +37,28 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest()
                 .body(new ApiError(
-                        400,
+                        HttpStatus.BAD_REQUEST.value(),
                         "Erro de validação",
                         message,
                         OffsetDateTime.now()
                 ));
-    }    
+    }
+    
+    /**
+     * 
+     * Handler genérico de fallback pra qualquer Exception não mapeada, 
+     * evitando vazar stacktrace pro cliente
+     * @param ex
+     * @return
+     */
+    
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleGeneric(Exception ex) {
+        return ResponseEntity.internalServerError()
+                .body(new ApiError(
+                        500,
+                        "Erro interno",
+                        "Ocorreu um erro inesperado",
+                        OffsetDateTime.now()));
+    }
 }
