@@ -2,17 +2,28 @@ package com.bndesigner.exceptions.handler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.bndesigner.exceptions.custom.BusinessException;
 
 import java.time.OffsetDateTime;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+	
+	private static final Map<Class<? extends Exception>, HttpStatus> STATUS_MAP = Map.of(
+            HttpMessageNotReadableException.class, HttpStatus.BAD_REQUEST,
+            MethodArgumentTypeMismatchException.class, HttpStatus.BAD_REQUEST,
+            HttpMediaTypeNotSupportedException.class, HttpStatus.UNSUPPORTED_MEDIA_TYPE
+    );
+	
 	
 	@ExceptionHandler(BusinessException.class)
 	public ResponseEntity<ApiError> handleBusinessException (
@@ -53,12 +64,12 @@ public class GlobalExceptionHandler {
      */
     
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleGeneric(Exception ex) {
-        return ResponseEntity.internalServerError()
-                .body(new ApiError(
-                        500,
-                        "Erro interno",
-                        "Ocorreu um erro inesperado",
-                        OffsetDateTime.now()));
+    public ResponseEntity<ApiError> handleException(Exception ex) {
+        HttpStatus status = STATUS_MAP.getOrDefault(ex.getClass(), HttpStatus.INTERNAL_SERVER_ERROR);
+        String title = status == HttpStatus.INTERNAL_SERVER_ERROR ? "Erro interno" : "Requisição inválida";
+        String message = status == HttpStatus.INTERNAL_SERVER_ERROR ? "Ocorreu um erro inesperado" : ex.getMessage();
+
+        return ResponseEntity.status(status)
+                .body(new ApiError(status.value(), title, message, OffsetDateTime.now()));
     }
 }

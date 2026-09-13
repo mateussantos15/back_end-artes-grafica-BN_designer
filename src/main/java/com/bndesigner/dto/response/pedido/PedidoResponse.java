@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.bndesigner.domain.enums.pedido.StatusPedido;
-import com.bndesigner.dto.response.itemPedido.ItemPedidoResponse;
+import com.bndesigner.dto.response.itempedido.ItemPedidoResponse;
 
 public record PedidoResponse(
 		

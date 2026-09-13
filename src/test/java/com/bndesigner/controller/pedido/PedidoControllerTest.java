@@ -1,9 +1,9 @@
 package com.bndesigner.controller.pedido;
 
 import com.bndesigner.domain.enums.pedido.StatusPedido;
-import com.bndesigner.dto.request.itemPedido.ItemPedidoRequest;
+import com.bndesigner.dto.request.itempedido.ItemPedidoRequest;
 import com.bndesigner.dto.request.pedido.PedidoCreatRequest;
-import com.bndesigner.dto.response.itemPedido.ItemPedidoResponse;
+import com.bndesigner.dto.response.itempedido.ItemPedidoResponse;
 import com.bndesigner.dto.response.pedido.PedidoResponse;
 import com.bndesigner.service.pedido.CheckoutService;
 import com.fasterxml.jackson.databind.ObjectMapper;

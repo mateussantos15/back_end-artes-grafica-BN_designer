@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bndesigner.domain.entity.cupom.Cupom;
-import com.bndesigner.domain.entity.itemPedido.ItemPedido;
+import com.bndesigner.domain.entity.itempedido.ItemPedido;
 import com.bndesigner.domain.entity.pedido.Pedido;
 import com.bndesigner.domain.entity.produto.Produto;
 import com.bndesigner.domain.entity.usuario.Usuario;
@@ -16,7 +16,7 @@ import com.bndesigner.domain.enums.pedido.StatusPedido;
 import com.bndesigner.domain.resolver.CupomResolver;
 import com.bndesigner.domain.resolver.ProdutoResolver;
 import com.bndesigner.domain.validation.PedidoValidator;
-import com.bndesigner.dto.request.itemPedido.ItemPedidoRequest;
+import com.bndesigner.dto.request.itempedido.ItemPedidoRequest;
 import com.bndesigner.dto.request.pedido.PedidoCreatRequest;
 import com.bndesigner.dto.response.pedido.PedidoResponse;
 import com.bndesigner.mapper.pedido.PedidoMapper;

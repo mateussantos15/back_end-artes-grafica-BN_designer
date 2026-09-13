@@ -1,4 +1,4 @@
-package com.bndesigner.dto.response.itemPedido;
+package com.bndesigner.dto.response.itempedido;
 
 import java.math.BigDecimal;
 

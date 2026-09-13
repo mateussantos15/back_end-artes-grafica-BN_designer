@@ -2,7 +2,7 @@ package com.bndesigner.domain.validation;
 
 import org.springframework.stereotype.Component;
 
-import com.bndesigner.dto.request.itemPedido.ItemPedidoRequest;
+import com.bndesigner.dto.request.itempedido.ItemPedidoRequest;
 import com.bndesigner.dto.request.pedido.PedidoCreatRequest;
 import com.bndesigner.exceptions.custom.ItemComQuantidadeInvalidaException;
 import com.bndesigner.exceptions.custom.PedidoSemItensException;
