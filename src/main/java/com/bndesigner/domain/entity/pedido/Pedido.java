@@ -9,7 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.bndesigner.domain.entity.cupom.Cupom;
-import com.bndesigner.domain.entity.itemPedido.ItemPedido;
+import com.bndesigner.domain.entity.itempedido.ItemPedido;
 import com.bndesigner.domain.entity.usuario.Usuario;
 import com.bndesigner.domain.enums.pedido.StatusPedido;
 

@@ -2,7 +2,7 @@ package com.bndesigner.dto.request.pedido;
 
 import java.util.List;
 
-import com.bndesigner.dto.request.itemPedido.ItemPedidoRequest;
+import com.bndesigner.dto.request.itempedido.ItemPedidoRequest;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;

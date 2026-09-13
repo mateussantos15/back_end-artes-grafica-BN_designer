@@ -1,10 +1,11 @@
 package com.bndesigner.repository.itemPedido;
 
 import com.bndesigner.config.JpaAuditingConfig;
-import com.bndesigner.domain.entity.itemPedido.ItemPedido;
+import com.bndesigner.domain.entity.itempedido.ItemPedido;
 import com.bndesigner.domain.entity.pedido.Pedido;
 import com.bndesigner.domain.entity.produto.Produto;
 import com.bndesigner.domain.enums.pedido.StatusPedido;
+import com.bndesigner.repository.itempedido.ItemPedidoRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

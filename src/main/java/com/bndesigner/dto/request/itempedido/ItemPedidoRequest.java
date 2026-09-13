@@ -1,4 +1,4 @@
-package com.bndesigner.dto.request.itemPedido;
+package com.bndesigner.dto.request.itempedido;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
