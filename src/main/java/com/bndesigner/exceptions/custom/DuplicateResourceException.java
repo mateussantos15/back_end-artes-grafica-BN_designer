@@ -2,6 +2,8 @@ package com.bndesigner.exceptions.custom;
 
 import org.springframework.http.HttpStatus;
 
+import com.bndesigner.exceptions.handler.BusinessException;
+
 /**
  * Exceção de negócio lançada quando é feita uma tentativa de salvar ou atualizar 
  * um recurso que possui valores duplicados para campos que deveriam ser únicos.

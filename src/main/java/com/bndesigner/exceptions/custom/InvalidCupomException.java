@@ -3,6 +3,8 @@ package com.bndesigner.exceptions.custom;
 import java.time.LocalDate;
 import org.springframework.http.HttpStatus;
 
+import com.bndesigner.exceptions.handler.BusinessException;
+
 public class InvalidCupomException extends BusinessException {
 	
 	private static final long serialVersionUID = 1L;

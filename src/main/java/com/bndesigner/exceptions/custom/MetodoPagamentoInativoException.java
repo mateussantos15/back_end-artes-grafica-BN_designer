@@ -2,6 +2,8 @@ package com.bndesigner.exceptions.custom;
 
 import org.springframework.http.HttpStatus;
 
+import com.bndesigner.exceptions.handler.BusinessException;
+
 public class MetodoPagamentoInativoException extends BusinessException {
 
     public MetodoPagamentoInativoException(Long metodoPagamentoId) {

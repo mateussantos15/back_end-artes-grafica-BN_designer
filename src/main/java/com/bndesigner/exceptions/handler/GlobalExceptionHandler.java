@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import com.bndesigner.exceptions.custom.BusinessException;
-
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
