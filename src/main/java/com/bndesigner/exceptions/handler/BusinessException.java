@@ -1,4 +1,4 @@
-package com.bndesigner.exceptions.custom;
+package com.bndesigner.exceptions.handler;
 
 import org.springframework.http.HttpStatus;
 

@@ -2,6 +2,8 @@ package com.bndesigner.exceptions.custom;
 
 import org.springframework.http.HttpStatus;
 
+import com.bndesigner.exceptions.handler.BusinessException;
+
 public class ProdutoSemArquivoException extends BusinessException {
 
     public ProdutoSemArquivoException(String tituloProduto) {

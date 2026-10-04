@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.http.HttpStatus;
 
+import com.bndesigner.exceptions.handler.BusinessException;
+
 public class CupomExpiradoException extends BusinessException {
 
     public CupomExpiradoException(String codigo, LocalDate dataValidade) {
