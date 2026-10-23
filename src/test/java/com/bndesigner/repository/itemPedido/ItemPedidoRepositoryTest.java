@@ -4,7 +4,9 @@ import com.bndesigner.config.JpaAuditingConfig;
 import com.bndesigner.domain.entity.itempedido.ItemPedido;
 import com.bndesigner.domain.entity.pedido.Pedido;
 import com.bndesigner.domain.entity.produto.Produto;
+import com.bndesigner.domain.entity.usuario.Usuario;
 import com.bndesigner.domain.enums.pedido.StatusPedido;
+import com.bndesigner.domain.enums.usuario.TipoUsuario;
 import com.bndesigner.repository.itempedido.ItemPedidoRepository;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -38,16 +40,29 @@ class ItemPedidoRepositoryTest {
 
     // ─── helpers ────────────────────────────────────────────────────────────
 
+    private Usuario usuarioSalvo;
+    private Usuario outroUsuarioSalvo;
     private Pedido pedidoSalvo;
     private Pedido outroPedidoSalvo;
     private Produto produtoSalvo;
     private Produto outroProdutoSalvo;
     private final Pageable pageable = PageRequest.of(0, 10);
+    
+	private Usuario buildUsuario(String nome, String email, String senha, TipoUsuario tipo) {
+		
+		return Usuario.builder()
+				.nome(nome)
+				.email(email)
+				.senha(senha)
+				.tipoUsuario(tipo)
+				.build();
+	}
 
-    private Pedido buildPedido(StatusPedido status, BigDecimal valorTotal) {
+    private Pedido buildPedido(StatusPedido status, BigDecimal valorTotal, Usuario usuario) {
         return Pedido.builder()
                 .statusPedido(status)
                 .valorTotal(valorTotal)
+                .usuario(usuario)
                 .build();
     }
  
@@ -70,21 +85,54 @@ class ItemPedidoRepositoryTest {
  
     @BeforeEach
     void setUp() {
-        pedidoSalvo = em.persistAndFlush(buildPedido(
-        		StatusPedido.PENDENTE, 
-        		new BigDecimal("100.00")));
+    	
+    	usuarioSalvo = em.persistAndFlush(
+    			buildUsuario(
+    					new String("Mateus"),
+    					new String("mateus@email.com"),
+    					new String("hash_senha"),
+    					TipoUsuario.CLIENTE
+    			)
+    	);
+    	
+    	outroUsuarioSalvo = em.persistAndFlush(
+    			buildUsuario(
+    					new String("João"),
+    					new String("joao@email.com"),
+    					new String("hash_senha"),
+    					TipoUsuario.CLIENTE
+    			)
+    	);
+    				
+        pedidoSalvo = em.persistAndFlush(
+        		buildPedido(
+        				StatusPedido.PENDENTE, 
+        				new BigDecimal("100.00"),
+        				usuarioSalvo
+        		)
+        );
         
-        outroPedidoSalvo = em.persistAndFlush(buildPedido(
-        		StatusPedido.PAGO, 
-        		new BigDecimal("200.00")));
+        outroPedidoSalvo = em.persistAndFlush(
+        		buildPedido(
+        				StatusPedido.PAGO,
+        				new BigDecimal("200.00"),
+        				outroUsuarioSalvo
+        		)
+        );
         
-        produtoSalvo = em.persistAndFlush(buildProduto(
-        		"Produto A", 
-        		new BigDecimal("49.90")));
+        produtoSalvo = em.persistAndFlush(
+        		buildProduto(
+        				"Produto A", 
+        				new BigDecimal("49.90")
+        		)
+        );
         
-        outroProdutoSalvo = em.persistAndFlush(buildProduto(
-        		"Produto B", 
-        		new BigDecimal("29.90")));
+        outroProdutoSalvo = em.persistAndFlush(
+        		buildProduto(
+        				"Produto B", 
+        				new BigDecimal("29.90")
+        		)
+        );
     }
 
 
@@ -328,6 +376,99 @@ class ItemPedidoRepositoryTest {
             assertThat(doSegundo).hasSize(1);
             assertThat(doPrimeiro.getContent().get(0).getIdItemPedido()).
             isNotEqualTo(doSegundo.getContent().get(0).getIdItemPedido());
+        }
+    }
+    
+ // ─── existsByPedidoUsuarioIdUsuarioAndProdutoIdProduto ───────────────────
+
+    @Nested
+    @DisplayName("existsByPedidoUsuarioIdUsuarioAndProdutoIdProduto")
+    class ExistsByUsuarioAndProduto {
+
+        @Test
+        @DisplayName("deve retornar true quando usuário comprou o produto")
+        void deveRetornarTrueQuandoUsuarioComprouProduto() {
+            itemPedidoRepository.save(
+                    buildItem(pedidoSalvo, produtoSalvo, 1, new BigDecimal("49.90")));
+            em.flush();
+            em.clear();
+
+            boolean existe = itemPedidoRepository
+                    .existsByPedidoUsuarioIdUsuarioAndProdutoIdProduto(
+                            usuarioSalvo.getIdUsuario(),
+                            produtoSalvo.getIdProduto());
+
+            assertThat(existe).isTrue();
+        }
+
+        @Test
+        @DisplayName("deve retornar false quando usuário nunca comprou o produto")
+        void deveRetornarFalseQuandoUsuarioNaoComprouProduto() {
+            boolean existe = itemPedidoRepository
+                    .existsByPedidoUsuarioIdUsuarioAndProdutoIdProduto(
+                            usuarioSalvo.getIdUsuario(),
+                            produtoSalvo.getIdProduto());
+
+            assertThat(existe).isFalse();
+        }
+
+        @Test
+        @DisplayName("deve retornar false quando outro usuário comprou o produto mas não este")
+        void deveRetornarFalseQuandoOutroUsuarioComprouProduto() {
+            itemPedidoRepository.save(
+                    buildItem(outroPedidoSalvo, produtoSalvo, 1, new BigDecimal("49.90")));
+            em.flush();
+            em.clear();
+
+            boolean existe = itemPedidoRepository
+                    .existsByPedidoUsuarioIdUsuarioAndProdutoIdProduto(
+                            usuarioSalvo.getIdUsuario(),
+                            produtoSalvo.getIdProduto());
+
+            assertThat(existe).isFalse();
+        }
+
+        @Test
+        @DisplayName("deve retornar false quando usuário comprou outro produto mas não este")
+        void deveRetornarFalseQuandoUsuarioComprouOutroProduto() {
+            itemPedidoRepository.save(
+                    buildItem(pedidoSalvo, outroProdutoSalvo, 1, new BigDecimal("29.90")));
+            em.flush();
+            em.clear();
+
+            boolean existe = itemPedidoRepository
+                    .existsByPedidoUsuarioIdUsuarioAndProdutoIdProduto(
+                            usuarioSalvo.getIdUsuario(),
+                            produtoSalvo.getIdProduto());
+
+            assertThat(existe).isFalse();
+        }
+
+        @Test
+        @DisplayName("deve retornar true mesmo com múltiplos itens no pedido")
+        void deveRetornarTrueComMultiplosItensDoPedido() {
+            itemPedidoRepository.save(
+                    buildItem(pedidoSalvo, outroProdutoSalvo, 2, new BigDecimal("29.90")));
+            itemPedidoRepository.save(
+                    buildItem(pedidoSalvo, produtoSalvo, 1, new BigDecimal("49.90")));
+            em.flush();
+            em.clear();
+
+            boolean existe = itemPedidoRepository
+                    .existsByPedidoUsuarioIdUsuarioAndProdutoIdProduto(
+                            usuarioSalvo.getIdUsuario(),
+                            produtoSalvo.getIdProduto());
+
+            assertThat(existe).isTrue();
+        }
+
+        @Test
+        @DisplayName("deve retornar false para ids inexistentes")
+        void deveRetornarFalseParaIdsInexistentes() {
+            boolean existe = itemPedidoRepository
+                    .existsByPedidoUsuarioIdUsuarioAndProdutoIdProduto(999L, 999L);
+
+            assertThat(existe).isFalse();
         }
     }
 }

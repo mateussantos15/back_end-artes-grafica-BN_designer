@@ -11,5 +11,9 @@ public interface ItemPedidoRepository extends JpaRepository<ItemPedido, Long> {
 	Page<ItemPedido> findByPedidoIdPedido(Long pedidoId, Pageable pageable);
 	
 	Page<ItemPedido> findByProdutoIdProduto(Long produtoId, Pageable pageable);
+	
+	boolean existsByPedidoUsuarioIdUsuarioAndProdutoIdProduto(
+            Long usuarioId,
+            Long produtoId);
 
 }
