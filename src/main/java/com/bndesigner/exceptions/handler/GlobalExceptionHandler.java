@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -19,7 +20,8 @@ public class GlobalExceptionHandler {
 	private static final Map<Class<? extends Exception>, HttpStatus> STATUS_MAP = Map.of(
             HttpMessageNotReadableException.class, HttpStatus.BAD_REQUEST,
             MethodArgumentTypeMismatchException.class, HttpStatus.BAD_REQUEST,
-            HttpMediaTypeNotSupportedException.class, HttpStatus.UNSUPPORTED_MEDIA_TYPE
+            HttpMediaTypeNotSupportedException.class, HttpStatus.UNSUPPORTED_MEDIA_TYPE,
+            MissingServletRequestParameterException.class, HttpStatus.BAD_REQUEST
     );
 	
 	
