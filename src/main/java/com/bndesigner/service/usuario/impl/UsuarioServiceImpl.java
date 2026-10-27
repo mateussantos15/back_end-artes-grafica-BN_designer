@@ -2,6 +2,7 @@ package com.bndesigner.service.usuario.impl;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ public class UsuarioServiceImpl implements UsuarioService{
 	private final UsuarioRepository usuarioRepository;
 	private final UsuarioMapper usuarioMapper;
 	private final UsuarioValidator usuarioValidator;
+	private final PasswordEncoder passwordEncoder;
 
 	@Override
 	@Transactional
@@ -32,6 +34,9 @@ public class UsuarioServiceImpl implements UsuarioService{
 		usuarioValidator.validarEmail(null, request.email());
 		
 		Usuario usuario = usuarioMapper.toEntity(request);
+		
+		usuario.setSenha(passwordEncoder.encode(request.senha()));
+		
 		Usuario salvo = usuarioRepository.save(usuario);
 		
 		return usuarioMapper.toResponse(salvo);
