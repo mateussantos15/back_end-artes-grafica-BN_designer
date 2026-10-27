@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.bndesigner.domain.entity.usuario.Usuario;
 import com.bndesigner.domain.validation.UsuarioValidator;
@@ -46,9 +48,12 @@ class UsuarioServiceTest {
     
     @Mock
     private UsuarioValidator usuarioValidator; // Injetado para gerenciar as validações de email
+    
+    @Mock
+    private PasswordEncoder passwordEncoder; // Injetado para codificação de senha
 
     @InjectMocks
-    private UsuarioServiceImpl implService;
+    private UsuarioServiceImpl usuarioServiceImpl;
 
     // ─────────────────────────────────────────────────────────────────────────
     // criar()
@@ -61,11 +66,14 @@ class UsuarioServiceTest {
         @Test
         @DisplayName("deve criar usuário com sucesso e retornar UsuarioResponse")
         void deveCriarUsuarioComSucesso() {
-            // Arrange
+
             UsuarioCreateRequest request = new UsuarioCreateRequest("Mateus", "Santos", "mateus@email.com", "123");
             Usuario usuario = new Usuario();
             Usuario salvo = new Usuario();
             UsuarioResponse response = new UsuarioResponse(1L, "Mateus", "Santos", "mateus@email.com");
+            
+            ArgumentCaptor<Usuario> usuarioCaptor = ArgumentCaptor.forClass(Usuario.class);
+            when(passwordEncoder.encode(request.senha())).thenReturn("senha-codificada");
 
             // O validador é void, então por padrão ele não faz nada (sucesso na validação)
             when(usuarioMapper.toEntity(request)).thenReturn(usuario);
@@ -73,7 +81,7 @@ class UsuarioServiceTest {
             when(usuarioMapper.toResponse(salvo)).thenReturn(response);
 
             // Act
-            UsuarioResponse resultado = implService.criar(request);
+            UsuarioResponse resultado = usuarioServiceImpl.criar(request);
 
             // Assert
             assertThat(resultado).isNotNull();
@@ -81,7 +89,8 @@ class UsuarioServiceTest {
             
             // Verifica se a validação foi chamada com ID null (já que está criando)
             verify(usuarioValidator).validarEmail(null, request.email());
-            verify(usuarioRepository).save(usuario);
+            verify(usuarioRepository).save(usuarioCaptor.capture());
+            assertThat(usuarioCaptor.getValue().getSenha()).isEqualTo("senha-codificada");
         }
 
         @Test
@@ -95,7 +104,7 @@ class UsuarioServiceTest {
                 .when(usuarioValidator).validarEmail(null, request.email());
 
             // Act & Assert
-            assertThatThrownBy(() -> implService.criar(request))
+            assertThatThrownBy(() -> usuarioServiceImpl.criar(request))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("O email já está em uso");
 
@@ -123,7 +132,7 @@ class UsuarioServiceTest {
             when(usuarioMapper.toResponse(usuario)).thenReturn(response);
 
             // Act
-            UsuarioResponse resultado = implService.buscarPorId(1L);
+            UsuarioResponse resultado = usuarioServiceImpl.buscarPorId(1L);
 
             // Assert
             assertThat(resultado).isNotNull();
@@ -137,7 +146,7 @@ class UsuarioServiceTest {
             when(usuarioRepository.findById(1L)).thenReturn(Optional.empty());
 
             // Act & Assert
-            assertThatThrownBy(() -> implService.buscarPorId(1L))
+            assertThatThrownBy(() -> usuarioServiceImpl.buscarPorId(1L))
                     .isInstanceOf(ResourceNotFoundException.class);
         }
     }
@@ -162,7 +171,7 @@ class UsuarioServiceTest {
             when(usuarioMapper.toResponse(usuario)).thenReturn(response);
 
             // Act
-            Page<UsuarioResponse> resultado = implService.listar(Pageable.unpaged());
+            Page<UsuarioResponse> resultado = usuarioServiceImpl.listar(Pageable.unpaged());
 
             // Assert
             assertThat(resultado).isNotNull();
@@ -195,7 +204,7 @@ class UsuarioServiceTest {
             when(usuarioMapper.toResponse(salvo)).thenReturn(response);
 
             // Act
-            UsuarioResponse resultado = implService.atualizar(1L, request);
+            UsuarioResponse resultado = usuarioServiceImpl.atualizar(1L, request);
 
             // Assert
             assertThat(resultado).isNotNull();
@@ -222,7 +231,7 @@ class UsuarioServiceTest {
                 .when(usuarioValidator).validarEmail(1L, request.email());
 
             // Act & Assert
-            assertThatThrownBy(() -> implService.atualizar(1L, request))
+            assertThatThrownBy(() -> usuarioServiceImpl.atualizar(1L, request))
                     .isInstanceOf(BusinessException.class)
                     .hasMessageContaining("O email já está em uso");
 
@@ -246,7 +255,7 @@ class UsuarioServiceTest {
             when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
 
             // Act
-            implService.deletar(1L);
+            usuarioServiceImpl.deletar(1L);
 
             // Assert
             verify(usuarioRepository).delete(usuario);
@@ -259,7 +268,7 @@ class UsuarioServiceTest {
             when(usuarioRepository.findById(1L)).thenReturn(Optional.empty());
 
             // Act & Assert
-            assertThatThrownBy(() -> implService.deletar(1L))
+            assertThatThrownBy(() -> usuarioServiceImpl.deletar(1L))
                     .isInstanceOf(ResourceNotFoundException.class);
 
             verify(usuarioRepository, never()).delete(any());
