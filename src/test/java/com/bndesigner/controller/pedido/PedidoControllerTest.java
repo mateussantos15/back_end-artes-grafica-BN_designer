@@ -1,5 +1,6 @@
 package com.bndesigner.controller.pedido;
 
+import com.bndesigner.config.SecurityConfig;
 import com.bndesigner.domain.enums.pedido.StatusPedido;
 import com.bndesigner.dto.request.itempedido.ItemPedidoRequest;
 import com.bndesigner.dto.request.pedido.PedidoCreatRequest;
@@ -12,7 +13,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -27,6 +30,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(PedidoController.class)
+@Import(SecurityConfig.class)
+@WithMockUser
 @DisplayName("PedidoController")
 class PedidoControllerTest {
 

@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -21,7 +22,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 
+import com.bndesigner.config.SecurityConfig;
 import com.bndesigner.dto.request.avaliacao.AvaliacaoCreateRequest;
 import com.bndesigner.dto.request.avaliacao.AvaliacaoUpdateRequest;
 import com.bndesigner.dto.response.avaliacao.AvaliacaoResponse;
@@ -29,6 +32,9 @@ import com.bndesigner.service.avaliacao.AvaliacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(AvaliacaoController.class)
+@Import(SecurityConfig.class)
+@WithMockUser
+@DisplayName("Testes do AvaliacaoController")
 class AvaliacaoControllerTest {
 
 	@Autowired
