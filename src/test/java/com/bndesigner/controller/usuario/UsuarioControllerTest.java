@@ -8,16 +8,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.bndesigner.config.SecurityConfig;
 import com.bndesigner.dto.request.usuario.UsuarioCreateRequest;
 import com.bndesigner.dto.request.usuario.UsuarioUpdateRequest;
 import com.bndesigner.dto.response.usuario.UsuarioResponse;
@@ -25,6 +29,9 @@ import com.bndesigner.service.usuario.impl.UsuarioServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(UsuarioController.class)
+@Import(SecurityConfig.class)
+@WithMockUser
+@DisplayName("Testes do UsuarioController")
 class UsuarioControllerTest {
 
     @Autowired

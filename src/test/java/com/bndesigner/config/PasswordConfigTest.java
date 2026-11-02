@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+@DisplayName("Testes para a classe PasswordConfig")
 public class PasswordConfigTest {
 	
 	private final PasswordEncoder passwordEncoder = 

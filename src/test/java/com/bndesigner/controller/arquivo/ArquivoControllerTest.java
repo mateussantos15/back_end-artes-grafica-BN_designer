@@ -1,5 +1,6 @@
 package com.bndesigner.controller.arquivo;
 
+import com.bndesigner.config.SecurityConfig;
 import com.bndesigner.dto.request.arquivo.ArquivoCreateRequest;
 import com.bndesigner.dto.request.arquivo.ArquivoUpdateRequest;
 import com.bndesigner.dto.response.arquivo.ArquivoResponse;
@@ -12,11 +13,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -29,6 +32,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ArquivoController.class)
+@Import(SecurityConfig.class)
+@WithMockUser
 @DisplayName("ArquivoController")
 class ArquivoControllerTest {
 
@@ -38,7 +43,7 @@ class ArquivoControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private ArquivoService arquivoService;
 
     // -------------------------------------------------------------------------
