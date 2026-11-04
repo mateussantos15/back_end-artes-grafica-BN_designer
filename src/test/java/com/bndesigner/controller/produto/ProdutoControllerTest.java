@@ -30,14 +30,16 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.bndesigner.config.PasswordConfig;
 import com.bndesigner.config.SecurityConfig;
 import com.bndesigner.dto.response.produto.ProdutoResponse;
 import com.bndesigner.exceptions.custom.ResourceNotFoundException;
 import com.bndesigner.service.produto.ProdutoService;
+import com.bndesigner.service.security.UsuarioDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(ProdutoController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, PasswordConfig.class})
 @WithMockUser
 @DisplayName("ProdutoController")
 class ProdutoControllerTest {
@@ -54,6 +56,9 @@ class ProdutoControllerTest {
 
     @MockitoBean
     private ProdutoService produtoService;
+    
+    @MockitoBean
+    private UsuarioDetailsService usuarioDetailsService;
 
     // ─────────────────────────────────────────────────────────────────────────
     // Fixtures

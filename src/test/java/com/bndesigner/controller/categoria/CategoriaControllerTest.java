@@ -1,11 +1,13 @@
 package com.bndesigner.controller.categoria;
 
+import com.bndesigner.config.PasswordConfig;
 import com.bndesigner.config.SecurityConfig;
 import com.bndesigner.dto.request.categoria.CategoriaCreateRequest;
 import com.bndesigner.dto.request.categoria.CategoriaUpdateRequest;
 import com.bndesigner.dto.response.categoria.CategoriaResponse;
 import com.bndesigner.exceptions.custom.ResourceNotFoundException;
 import com.bndesigner.service.categoria.CategoriaService;
+import com.bndesigner.service.security.UsuarioDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CategoriaController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, PasswordConfig.class})
 @WithMockUser
 @DisplayName("CategoriaController Testes de Integração")
 class CategoriaControllerTest {
@@ -42,6 +44,9 @@ class CategoriaControllerTest {
 
     @MockitoBean
     private CategoriaService categoriaService;
+    
+    @MockitoBean
+    private UsuarioDetailsService usuarioDetailsService;
 
     // ─── Fixtures ─────────────────────────────────────────────────────────────
 

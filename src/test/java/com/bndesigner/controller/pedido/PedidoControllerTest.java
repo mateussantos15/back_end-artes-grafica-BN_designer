@@ -1,5 +1,6 @@
 package com.bndesigner.controller.pedido;
 
+import com.bndesigner.config.PasswordConfig;
 import com.bndesigner.config.SecurityConfig;
 import com.bndesigner.domain.enums.pedido.StatusPedido;
 import com.bndesigner.dto.request.itempedido.ItemPedidoRequest;
@@ -7,6 +8,7 @@ import com.bndesigner.dto.request.pedido.PedidoCreatRequest;
 import com.bndesigner.dto.response.itempedido.ItemPedidoResponse;
 import com.bndesigner.dto.response.pedido.PedidoResponse;
 import com.bndesigner.service.pedido.CheckoutService;
+import com.bndesigner.service.security.UsuarioDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,7 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(PedidoController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, PasswordConfig.class})
 @WithMockUser
 @DisplayName("PedidoController")
 class PedidoControllerTest {
@@ -45,6 +47,9 @@ class PedidoControllerTest {
 
     @MockitoBean
     private CheckoutService checkoutService;
+    
+    @MockitoBean
+    private UsuarioDetailsService usuarioDetailsService;
 
     // ─── fixtures ───────────────────────────────────────────────────────────
 

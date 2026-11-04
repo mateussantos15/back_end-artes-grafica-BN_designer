@@ -21,12 +21,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.bndesigner.dto.request.pagamento.PagamentoCreateRequest;
 import com.bndesigner.dto.response.pagamento.PagamentoResponse;
+import com.bndesigner.config.PasswordConfig;
 import com.bndesigner.config.SecurityConfig;
 import com.bndesigner.domain.enums.pagamento.StatusPagamento;
 import com.bndesigner.service.pagamento.PagamentoService;
+import com.bndesigner.service.security.UsuarioDetailsService;
 
 @WebMvcTest(PagamentoController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, PasswordConfig.class})
 @WithMockUser
 @DisplayName("Testes do controller de pagamento")
 class PagamentoControllerTest {
@@ -36,6 +38,9 @@ class PagamentoControllerTest {
 
     @MockitoBean
     private PagamentoService pagamentoService;
+    
+    @MockitoBean
+    private UsuarioDetailsService usuarioDetailsService;
 
     @Test
     void deveCriarPagamento() throws Exception {

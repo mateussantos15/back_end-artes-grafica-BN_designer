@@ -9,6 +9,8 @@ import com.bndesigner.dto.response.cupom.ValidacaoCupomResponse;
 import com.bndesigner.exceptions.custom.ResourceNotFoundException;
 import com.bndesigner.exceptions.handler.BusinessException;
 import com.bndesigner.service.cupom.CupomService;
+import com.bndesigner.service.security.UsuarioDetailsService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,6 +28,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.bndesigner.config.PasswordConfig;
 import com.bndesigner.config.SecurityConfig;
 import com.bndesigner.domain.enums.cupom.StatusCupom;
 import java.math.BigDecimal;
@@ -38,7 +41,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CupomController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, PasswordConfig.class})
 @WithMockUser
 @DisplayName("CupomController")
 class CupomControllerTest {
@@ -48,6 +51,9 @@ class CupomControllerTest {
 
     @MockitoBean
     private CupomService cupomService;
+    
+    @MockitoBean
+    private UsuarioDetailsService usuarioDetailsService;
 
     private ObjectMapper objectMapper;
 

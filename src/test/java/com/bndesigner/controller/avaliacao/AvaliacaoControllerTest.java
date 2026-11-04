@@ -24,15 +24,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import com.bndesigner.config.PasswordConfig;
 import com.bndesigner.config.SecurityConfig;
 import com.bndesigner.dto.request.avaliacao.AvaliacaoCreateRequest;
 import com.bndesigner.dto.request.avaliacao.AvaliacaoUpdateRequest;
 import com.bndesigner.dto.response.avaliacao.AvaliacaoResponse;
 import com.bndesigner.service.avaliacao.AvaliacaoService;
+import com.bndesigner.service.security.UsuarioDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(AvaliacaoController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, PasswordConfig.class})
 @WithMockUser
 @DisplayName("Testes do AvaliacaoController")
 class AvaliacaoControllerTest {
@@ -45,6 +47,9 @@ class AvaliacaoControllerTest {
 
 	@MockitoBean
 	private AvaliacaoService avaliacaoService;
+	
+	@MockitoBean
+	private UsuarioDetailsService usuarioDetailsService;
 
 	@Nested
 	@DisplayName("POST /api/avaliacoes")
