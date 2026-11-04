@@ -1,5 +1,6 @@
 package com.bndesigner.controller.arquivo;
 
+import com.bndesigner.config.PasswordConfig;
 import com.bndesigner.config.SecurityConfig;
 import com.bndesigner.dto.request.arquivo.ArquivoCreateRequest;
 import com.bndesigner.dto.request.arquivo.ArquivoUpdateRequest;
@@ -7,6 +8,7 @@ import com.bndesigner.dto.response.arquivo.ArquivoResponse;
 import com.bndesigner.exceptions.custom.ResourceNotFoundException;
 import com.bndesigner.exceptions.handler.BusinessException;
 import com.bndesigner.service.arquivo.ArquivoService;
+import com.bndesigner.service.security.UsuarioDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,7 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ArquivoController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, PasswordConfig.class})
 @WithMockUser
 @DisplayName("ArquivoController")
 class ArquivoControllerTest {
@@ -45,6 +47,9 @@ class ArquivoControllerTest {
 
     @MockitoBean
     private ArquivoService arquivoService;
+    
+    @MockitoBean
+    private UsuarioDetailsService usuarioDetailsService;
 
     // -------------------------------------------------------------------------
     // Fixtures

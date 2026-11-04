@@ -25,15 +25,17 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.bndesigner.config.PasswordConfig;
 import com.bndesigner.config.SecurityConfig;
 import com.bndesigner.dto.request.metodopagamento.MetodoPagamentoCreateRequest;
 import com.bndesigner.dto.request.metodopagamento.MetodoPagamentoUpdateRequest;
 import com.bndesigner.dto.response.metodopagamento.MetodoPagamentoResponse;
 import com.bndesigner.service.metodopagamento.impl.MetodoPagamentoService;
+import com.bndesigner.service.security.UsuarioDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(MetodoPagamentoController.class)
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, PasswordConfig.class})
 @WithMockUser
 @DisplayName("MetodoPagamentoController")
 class MetodoPagamentoControllerTest {
@@ -46,6 +48,9 @@ class MetodoPagamentoControllerTest {
 
     @MockitoBean
     private MetodoPagamentoService metodoPagamentoService;
+    
+    @MockitoBean
+    private UsuarioDetailsService usuarioDetailsService;
 
     private final MetodoPagamentoResponse response =
             new MetodoPagamentoResponse(
