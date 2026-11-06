@@ -14,6 +14,7 @@ import com.bndesigner.dto.response.usuario.UsuarioResponse;
 public interface UsuarioMapper {
 	
 	@Mapping(target = "idUsuario", ignore = true)
+	@Mapping(target = "tipoUsuario", ignore = true)
 	Usuario toEntity(UsuarioCreateRequest request);
 	
 	UsuarioResponse toResponse(Usuario usuario);

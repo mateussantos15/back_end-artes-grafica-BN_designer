@@ -27,7 +27,7 @@ import com.bndesigner.dto.request.usuario.UsuarioCreateRequest;
 import com.bndesigner.dto.request.usuario.UsuarioUpdateRequest;
 import com.bndesigner.dto.response.usuario.UsuarioResponse;
 import com.bndesigner.service.security.UsuarioDetailsService;
-import com.bndesigner.service.usuario.impl.UsuarioServiceImpl;
+import com.bndesigner.service.usuario.UsuarioService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(UsuarioController.class)
@@ -40,7 +40,7 @@ class UsuarioControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private UsuarioServiceImpl usuarioService;
+    private UsuarioService usuarioService;
     
     @MockitoBean
     private UsuarioDetailsService usuarioDetailsService;
@@ -59,7 +59,7 @@ class UsuarioControllerTest {
         when(usuarioService.criar(any()))
                 .thenReturn(response);
 
-        mockMvc.perform(post("/usuarios")
+        mockMvc.perform(post("/api/usuarios")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isCreated())
@@ -75,7 +75,7 @@ class UsuarioControllerTest {
         when(usuarioService.buscarPorId(1L))
                 .thenReturn(response);
 
-        mockMvc.perform(get("/usuarios/{id}", 1L))
+        mockMvc.perform(get("/api/usuarios/{id}", 1L))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.nome").value("Mateus"));
     }
@@ -91,7 +91,7 @@ class UsuarioControllerTest {
         when(usuarioService.listar(any(Pageable.class)))
                 .thenReturn(page);
 
-        mockMvc.perform(get("/usuarios"))
+        mockMvc.perform(get("/api/usuarios"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.content[0].email")
                 .value("mateus@email.com"));
@@ -108,7 +108,7 @@ class UsuarioControllerTest {
         when(usuarioService.atualizar(eq(1L), any()))
                 .thenReturn(response);
 
-        mockMvc.perform(put("/usuarios/{id}", 1L)
+        mockMvc.perform(put("/api/usuarios/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
@@ -117,7 +117,7 @@ class UsuarioControllerTest {
 
     @Test
     void deveRemoverUsuarioComSucesso() throws Exception {
-        mockMvc.perform(delete("/usuarios/{id}", 1L))
+        mockMvc.perform(delete("/api/usuarios/{id}", 1L))
             .andExpect(status().isNoContent());
     }
 }

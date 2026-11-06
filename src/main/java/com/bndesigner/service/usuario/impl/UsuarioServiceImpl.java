@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.bndesigner.domain.entity.usuario.Usuario;
+import com.bndesigner.domain.enums.usuario.TipoUsuario;
 import com.bndesigner.domain.validation.UsuarioValidator;
 import com.bndesigner.dto.request.usuario.UsuarioCreateRequest;
 import com.bndesigner.dto.request.usuario.UsuarioUpdateRequest;
@@ -36,6 +37,8 @@ public class UsuarioServiceImpl implements UsuarioService{
 		Usuario usuario = usuarioMapper.toEntity(request);
 		
 		usuario.setSenha(passwordEncoder.encode(request.senha()));
+		
+		usuario.setTipoUsuario(TipoUsuario.CLIENTE);
 		
 		Usuario salvo = usuarioRepository.save(usuario);
 		

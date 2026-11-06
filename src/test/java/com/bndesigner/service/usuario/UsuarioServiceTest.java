@@ -26,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.bndesigner.domain.entity.usuario.Usuario;
+import com.bndesigner.domain.enums.usuario.TipoUsuario;
 import com.bndesigner.domain.validation.UsuarioValidator;
 import com.bndesigner.dto.request.usuario.UsuarioCreateRequest;
 import com.bndesigner.dto.request.usuario.UsuarioUpdateRequest;
@@ -63,35 +64,38 @@ class UsuarioServiceTest {
     @DisplayName("criar()")
     class Criar {
 
-        @Test
-        @DisplayName("deve criar usuário com sucesso e retornar UsuarioResponse")
-        void deveCriarUsuarioComSucesso() {
+    	@Test
+    	@DisplayName("deve criar usuário com sucesso e retornar UsuarioResponse")
+    	void deveCriarUsuarioComSucesso() {
+    	    // Arrange
+    	    UsuarioCreateRequest request =
+    	            new UsuarioCreateRequest("Mateus", "Santos", "mateus@email.com", "123");
+    	    Usuario usuario = new Usuario();
+    	    Usuario salvo = new Usuario();
+    	    UsuarioResponse response =
+    	            new UsuarioResponse(1L, "Mateus", "Santos", "mateus@email.com");
 
-            UsuarioCreateRequest request = new UsuarioCreateRequest("Mateus", "Santos", "mateus@email.com", "123");
-            Usuario usuario = new Usuario();
-            Usuario salvo = new Usuario();
-            UsuarioResponse response = new UsuarioResponse(1L, "Mateus", "Santos", "mateus@email.com");
-            
-            ArgumentCaptor<Usuario> usuarioCaptor = ArgumentCaptor.forClass(Usuario.class);
-            when(passwordEncoder.encode(request.senha())).thenReturn("senha-codificada");
+    	    ArgumentCaptor<Usuario> usuarioCaptor = ArgumentCaptor.forClass(Usuario.class);
 
-            // O validador é void, então por padrão ele não faz nada (sucesso na validação)
-            when(usuarioMapper.toEntity(request)).thenReturn(usuario);
-            when(usuarioRepository.save(usuario)).thenReturn(salvo);
-            when(usuarioMapper.toResponse(salvo)).thenReturn(response);
+    	    when(usuarioMapper.toEntity(request)).thenReturn(usuario);
+    	    when(passwordEncoder.encode(request.senha())).thenReturn("senha-codificada");
+    	    when(usuarioRepository.save(any(Usuario.class))).thenReturn(salvo);
+    	    when(usuarioMapper.toResponse(salvo)).thenReturn(response);
 
-            // Act
-            UsuarioResponse resultado = usuarioServiceImpl.criar(request);
+    	    // Act
+    	    UsuarioResponse resultado = usuarioServiceImpl.criar(request);
 
-            // Assert
-            assertThat(resultado).isNotNull();
-            assertThat(resultado.nome()).isEqualTo("Mateus");
-            
-            // Verifica se a validação foi chamada com ID null (já que está criando)
-            verify(usuarioValidator).validarEmail(null, request.email());
-            verify(usuarioRepository).save(usuarioCaptor.capture());
-            assertThat(usuarioCaptor.getValue().getSenha()).isEqualTo("senha-codificada");
-        }
+    	    // Assert
+    	    assertThat(resultado).isNotNull();
+    	    assertThat(resultado.nome()).isEqualTo("Mateus");
+
+    	    verify(usuarioValidator).validarEmail(null, request.email());
+    	    verify(usuarioRepository).save(usuarioCaptor.capture());
+
+    	    Usuario usuarioSalvo = usuarioCaptor.getValue();
+    	    assertThat(usuarioSalvo.getSenha()).isEqualTo("senha-codificada");
+    	    assertThat(usuarioSalvo.getTipoUsuario()).isEqualTo(TipoUsuario.CLIENTE);
+    	}
 
         @Test
         @DisplayName("deve lançar BusinessException quando o validador acusar email já existente")
